@@ -1,432 +1,432 @@
 -- MySQL 8.0+ schema for a model and trading-card store.
 -- Import with: mysql -u root -p < database/schema.sql
 
-CREATE DATABASE IF NOT EXISTS model_store
+CREATE DATABASE IF NOT EXISTS ChoFigureThe
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE model_store;
+USE ChoFigureThe;
 
 CREATE TABLE users (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(150) NOT NULL,
-    email VARCHAR(190) NOT NULL,
-    phone VARCHAR(30) NULL,
-    password VARCHAR(255) NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'active',
-    email_verified_at TIMESTAMP NULL,
-    remember_token VARCHAR(100) NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY users_email_unique (email),
-    KEY users_status_index (status),
-    CONSTRAINT users_status_check CHECK (status IN ('active', 'locked'))
+    MaNguoiDung BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    HoTen VARCHAR(150) NOT NULL,
+    Email VARCHAR(190) NOT NULL,
+    SoDienThoai VARCHAR(30) NULL,
+    MatKhau VARCHAR(255) NOT NULL,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'active',
+    XacThucEmailLuc TIMESTAMP NULL,
+    MaGhiNho VARCHAR(100) NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    NgayXoa TIMESTAMP NULL,
+    PRIMARY KEY (MaNguoiDung),
+    UNIQUE KEY users_email_unique (Email),
+    KEY users_status_index (TrangThai),
+    CONSTRAINT users_status_check CHECK (TrangThai IN ('active', 'locked'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE roles (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(80) NOT NULL,
-    display_name VARCHAR(120) NOT NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY roles_name_unique (name)
+    MaVaiTro BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    TenVaiTro VARCHAR(80) NOT NULL,
+    TenHienThi VARCHAR(120) NOT NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaVaiTro),
+    UNIQUE KEY roles_name_unique (TenVaiTro)
 ) ENGINE=InnoDB;
 
 CREATE TABLE permissions (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    display_name VARCHAR(150) NOT NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY permissions_name_unique (name)
+    MaQuyen BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    TenQuyen VARCHAR(100) NOT NULL,
+    TenHienThi VARCHAR(150) NOT NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaQuyen),
+    UNIQUE KEY permissions_name_unique (TenQuyen)
 ) ENGINE=InnoDB;
 
 CREATE TABLE user_roles (
-    user_id BIGINT UNSIGNED NOT NULL,
-    role_id BIGINT UNSIGNED NOT NULL,
-    PRIMARY KEY (user_id, role_id),
-    CONSTRAINT user_roles_user_fk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT user_roles_role_fk FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
+    MaNguoiDung BIGINT UNSIGNED NOT NULL,
+    MaVaiTro BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (MaNguoiDung, MaVaiTro),
+    CONSTRAINT user_roles_user_fk FOREIGN KEY (MaNguoiDung) REFERENCES users (MaNguoiDung) ON DELETE CASCADE,
+    CONSTRAINT user_roles_role_fk FOREIGN KEY (MaVaiTro) REFERENCES roles (MaVaiTro) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE role_permissions (
-    role_id BIGINT UNSIGNED NOT NULL,
-    permission_id BIGINT UNSIGNED NOT NULL,
-    PRIMARY KEY (role_id, permission_id),
-    CONSTRAINT role_permissions_role_fk FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,
-    CONSTRAINT role_permissions_permission_fk FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
+    MaVaiTro BIGINT UNSIGNED NOT NULL,
+    MaQuyen BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (MaVaiTro, MaQuyen),
+    CONSTRAINT role_permissions_role_fk FOREIGN KEY (MaVaiTro) REFERENCES roles (MaVaiTro) ON DELETE CASCADE,
+    CONSTRAINT role_permissions_permission_fk FOREIGN KEY (MaQuyen) REFERENCES permissions (MaQuyen) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE addresses (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    user_id BIGINT UNSIGNED NOT NULL,
-    recipient_name VARCHAR(150) NOT NULL,
-    phone VARCHAR(30) NOT NULL,
-    province VARCHAR(120) NOT NULL,
-    district VARCHAR(120) NOT NULL,
-    ward VARCHAR(120) NOT NULL,
-    address_line VARCHAR(255) NOT NULL,
-    is_default BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY addresses_user_index (user_id),
-    CONSTRAINT addresses_user_fk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    MaDiaChi BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaNguoiDung BIGINT UNSIGNED NOT NULL,
+    TenNguoiNhan VARCHAR(150) NOT NULL,
+    SoDienThoai VARCHAR(30) NOT NULL,
+    TinhThanh VARCHAR(120) NOT NULL,
+    QuanHuyen VARCHAR(120) NOT NULL,
+    PhuongXa VARCHAR(120) NOT NULL,
+    DiaChiChiTiet VARCHAR(255) NOT NULL,
+    MacDinh BOOLEAN NOT NULL DEFAULT FALSE,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaDiaChi),
+    KEY addresses_user_index (MaNguoiDung),
+    CONSTRAINT addresses_user_fk FOREIGN KEY (MaNguoiDung) REFERENCES users (MaNguoiDung) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE categories (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    parent_id BIGINT UNSIGNED NULL,
-    name VARCHAR(150) NOT NULL,
-    slug VARCHAR(180) NOT NULL,
-    description TEXT NULL,
-    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
-    status VARCHAR(20) NOT NULL DEFAULT 'active',
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY categories_slug_unique (slug),
-    KEY categories_parent_status_index (parent_id, status),
-    CONSTRAINT categories_parent_fk FOREIGN KEY (parent_id) REFERENCES categories (id) ON DELETE SET NULL,
-    CONSTRAINT categories_status_check CHECK (status IN ('active', 'hidden'))
+    MaDanhMuc BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaDanhMucCha BIGINT UNSIGNED NULL,
+    TenDanhMuc VARCHAR(150) NOT NULL,
+    DuongDan VARCHAR(180) NOT NULL,
+    MoTa TEXT NULL,
+    ThuTuSapXep INT UNSIGNED NOT NULL DEFAULT 0,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'active',
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    NgayXoa TIMESTAMP NULL,
+    PRIMARY KEY (MaDanhMuc),
+    UNIQUE KEY categories_slug_unique (DuongDan),
+    KEY categories_parent_status_index (MaDanhMucCha, TrangThai),
+    CONSTRAINT categories_parent_fk FOREIGN KEY (MaDanhMucCha) REFERENCES categories (MaDanhMuc) ON DELETE SET NULL,
+    CONSTRAINT categories_status_check CHECK (TrangThai IN ('active', 'hidden'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE products (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    category_id BIGINT UNSIGNED NOT NULL,
-    sku VARCHAR(80) NOT NULL,
-    name VARCHAR(200) NOT NULL,
-    slug VARCHAR(220) NOT NULL,
-    description TEXT NULL,
-    price DECIMAL(12,2) NOT NULL,
-    stock_quantity INT UNSIGNED NOT NULL DEFAULT 0,
-    status VARCHAR(20) NOT NULL DEFAULT 'draft',
-    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
-    published_at TIMESTAMP NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY products_sku_unique (sku),
-    UNIQUE KEY products_slug_unique (slug),
-    KEY products_category_status_index (category_id, status),
-    KEY products_price_index (price),
-    KEY products_published_index (published_at),
-    CONSTRAINT products_category_fk FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE RESTRICT,
-    CONSTRAINT products_price_check CHECK (price >= 0),
-    CONSTRAINT products_status_check CHECK (status IN ('draft', 'active', 'out_of_stock', 'hidden'))
+    MaSanPham BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaDanhMuc BIGINT UNSIGNED NOT NULL,
+    MaSKU VARCHAR(80) NOT NULL,
+    TenSanPham VARCHAR(200) NOT NULL,
+    DuongDan VARCHAR(220) NOT NULL,
+    MoTa TEXT NULL,
+    Gia DECIMAL(12,2) NOT NULL,
+    SoLuongTon INT UNSIGNED NOT NULL DEFAULT 0,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'draft',
+    NoiBat BOOLEAN NOT NULL DEFAULT FALSE,
+    NgayDang TIMESTAMP NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    NgayXoa TIMESTAMP NULL,
+    PRIMARY KEY (MaSanPham),
+    UNIQUE KEY products_sku_unique (MaSKU),
+    UNIQUE KEY products_slug_unique (DuongDan),
+    KEY products_category_status_index (MaDanhMuc, TrangThai),
+    KEY products_price_index (Gia),
+    KEY products_published_index (NgayDang),
+    CONSTRAINT products_category_fk FOREIGN KEY (MaDanhMuc) REFERENCES categories (MaDanhMuc) ON DELETE RESTRICT,
+    CONSTRAINT products_price_check CHECK (Gia >= 0),
+    CONSTRAINT products_status_check CHECK (TrangThai IN ('draft', 'active', 'out_of_stock', 'hidden'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE product_images (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    product_id BIGINT UNSIGNED NOT NULL,
-    image_path VARCHAR(500) NOT NULL,
-    alt_text VARCHAR(255) NULL,
-    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY product_images_product_index (product_id, sort_order),
-    CONSTRAINT product_images_product_fk FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+    MaHinhAnh BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaSanPham BIGINT UNSIGNED NOT NULL,
+    DuongDanHinhAnh VARCHAR(500) NOT NULL,
+    MoTaHinhAnh VARCHAR(255) NULL,
+    ThuTuSapXep INT UNSIGNED NOT NULL DEFAULT 0,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaHinhAnh),
+    KEY product_images_product_index (MaSanPham, ThuTuSapXep),
+    CONSTRAINT product_images_product_fk FOREIGN KEY (MaSanPham) REFERENCES products (MaSanPham) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE inventory_movements (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    product_id BIGINT UNSIGNED NOT NULL,
-    actor_id BIGINT UNSIGNED NULL,
-    quantity_change INT NOT NULL,
-    reason VARCHAR(255) NOT NULL,
-    reference_type VARCHAR(50) NULL,
-    reference_id BIGINT UNSIGNED NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY inventory_movements_product_date_index (product_id, created_at),
-    CONSTRAINT inventory_movements_product_fk FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE RESTRICT,
-    CONSTRAINT inventory_movements_actor_fk FOREIGN KEY (actor_id) REFERENCES users (id) ON DELETE SET NULL
+    MaBienDongKho BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaSanPham BIGINT UNSIGNED NOT NULL,
+    MaNguoiThucHien BIGINT UNSIGNED NULL,
+    ThayDoiSoLuong INT NOT NULL,
+    LyDo VARCHAR(255) NOT NULL,
+    LoaiThamChieu VARCHAR(50) NULL,
+    MaThamChieu BIGINT UNSIGNED NULL,
+    NgayTao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaBienDongKho),
+    KEY inventory_movements_product_date_index (MaSanPham, NgayTao),
+    CONSTRAINT inventory_movements_product_fk FOREIGN KEY (MaSanPham) REFERENCES products (MaSanPham) ON DELETE RESTRICT,
+    CONSTRAINT inventory_movements_actor_fk FOREIGN KEY (MaNguoiThucHien) REFERENCES users (MaNguoiDung) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE carts (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    user_id BIGINT UNSIGNED NULL,
-    session_key VARCHAR(120) NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY carts_session_key_unique (session_key),
-    KEY carts_user_index (user_id),
-    CONSTRAINT carts_user_fk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    MaGioHang BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaNguoiDung BIGINT UNSIGNED NULL,
+    KhoaPhien VARCHAR(120) NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaGioHang),
+    UNIQUE KEY carts_session_key_unique (KhoaPhien),
+    KEY carts_user_index (MaNguoiDung),
+    CONSTRAINT carts_user_fk FOREIGN KEY (MaNguoiDung) REFERENCES users (MaNguoiDung) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE cart_items (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    cart_id BIGINT UNSIGNED NOT NULL,
-    product_id BIGINT UNSIGNED NOT NULL,
-    quantity INT UNSIGNED NOT NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY cart_items_cart_product_unique (cart_id, product_id),
-    CONSTRAINT cart_items_cart_fk FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE,
-    CONSTRAINT cart_items_product_fk FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE RESTRICT,
-    CONSTRAINT cart_items_quantity_check CHECK (quantity > 0)
+    MaChiTietGioHang BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaGioHang BIGINT UNSIGNED NOT NULL,
+    MaSanPham BIGINT UNSIGNED NOT NULL,
+    SoLuong INT UNSIGNED NOT NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaChiTietGioHang),
+    UNIQUE KEY cart_items_cart_product_unique (MaGioHang, MaSanPham),
+    CONSTRAINT cart_items_cart_fk FOREIGN KEY (MaGioHang) REFERENCES carts (MaGioHang) ON DELETE CASCADE,
+    CONSTRAINT cart_items_product_fk FOREIGN KEY (MaSanPham) REFERENCES products (MaSanPham) ON DELETE RESTRICT,
+    CONSTRAINT cart_items_quantity_check CHECK (SoLuong > 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE promotions (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(180) NOT NULL,
-    description TEXT NULL,
-    discount_type VARCHAR(20) NOT NULL,
-    discount_value DECIMAL(12,2) NOT NULL,
-    starts_at DATETIME NOT NULL,
-    expires_at DATETIME NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'scheduled',
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY promotions_status_dates_index (status, starts_at, expires_at),
-    CONSTRAINT promotions_type_check CHECK (discount_type IN ('percent', 'fixed')),
-    CONSTRAINT promotions_value_check CHECK (discount_value > 0),
-    CONSTRAINT promotions_status_check CHECK (status IN ('scheduled', 'active', 'inactive'))
+    MaKhuyenMai BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    TenKhuyenMai VARCHAR(180) NOT NULL,
+    MoTa TEXT NULL,
+    LoaiGiamGia VARCHAR(20) NOT NULL,
+    GiaTriGiam DECIMAL(12,2) NOT NULL,
+    BatDauLuc DATETIME NOT NULL,
+    KetThucLuc DATETIME NOT NULL,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'scheduled',
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaKhuyenMai),
+    KEY promotions_status_dates_index (TrangThai, BatDauLuc, KetThucLuc),
+    CONSTRAINT promotions_type_check CHECK (LoaiGiamGia IN ('percent', 'fixed')),
+    CONSTRAINT promotions_value_check CHECK (GiaTriGiam > 0),
+    CONSTRAINT promotions_status_check CHECK (TrangThai IN ('scheduled', 'active', 'inactive'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE promotion_products (
-    promotion_id BIGINT UNSIGNED NOT NULL,
-    product_id BIGINT UNSIGNED NOT NULL,
-    PRIMARY KEY (promotion_id, product_id),
-    CONSTRAINT promotion_products_promotion_fk FOREIGN KEY (promotion_id) REFERENCES promotions (id) ON DELETE CASCADE,
-    CONSTRAINT promotion_products_product_fk FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+    MaKhuyenMai BIGINT UNSIGNED NOT NULL,
+    MaSanPham BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (MaKhuyenMai, MaSanPham),
+    CONSTRAINT promotion_products_promotion_fk FOREIGN KEY (MaKhuyenMai) REFERENCES promotions (MaKhuyenMai) ON DELETE CASCADE,
+    CONSTRAINT promotion_products_product_fk FOREIGN KEY (MaSanPham) REFERENCES products (MaSanPham) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE coupons (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    code VARCHAR(80) NOT NULL,
-    discount_type VARCHAR(20) NOT NULL,
-    discount_value DECIMAL(12,2) NOT NULL,
-    minimum_order_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
-    max_uses INT UNSIGNED NULL,
-    max_uses_per_user INT UNSIGNED NULL,
-    usage_count INT UNSIGNED NOT NULL DEFAULT 0,
-    starts_at DATETIME NOT NULL,
-    expires_at DATETIME NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'active',
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY coupons_code_unique (code),
-    KEY coupons_status_dates_index (status, starts_at, expires_at),
-    CONSTRAINT coupons_type_check CHECK (discount_type IN ('percent', 'fixed')),
-    CONSTRAINT coupons_value_check CHECK (discount_value > 0),
-    CONSTRAINT coupons_minimum_check CHECK (minimum_order_amount >= 0),
-    CONSTRAINT coupons_status_check CHECK (status IN ('active', 'inactive'))
+    MaPhieuGiamGia BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaUuDai VARCHAR(80) NOT NULL,
+    LoaiGiamGia VARCHAR(20) NOT NULL,
+    GiaTriGiam DECIMAL(12,2) NOT NULL,
+    DonHangToiThieu DECIMAL(12,2) NOT NULL DEFAULT 0,
+    SoLanSuDungToiDa INT UNSIGNED NULL,
+    SoLanSuDungToiDaMoiNguoi INT UNSIGNED NULL,
+    SoLanDaSuDung INT UNSIGNED NOT NULL DEFAULT 0,
+    BatDauLuc DATETIME NOT NULL,
+    KetThucLuc DATETIME NOT NULL,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'active',
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaPhieuGiamGia),
+    UNIQUE KEY coupons_code_unique (MaUuDai),
+    KEY coupons_status_dates_index (TrangThai, BatDauLuc, KetThucLuc),
+    CONSTRAINT coupons_type_check CHECK (LoaiGiamGia IN ('percent', 'fixed')),
+    CONSTRAINT coupons_value_check CHECK (GiaTriGiam > 0),
+    CONSTRAINT coupons_minimum_check CHECK (DonHangToiThieu >= 0),
+    CONSTRAINT coupons_status_check CHECK (TrangThai IN ('active', 'inactive'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE orders (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    user_id BIGINT UNSIGNED NULL,
-    address_id BIGINT UNSIGNED NULL,
-    coupon_id BIGINT UNSIGNED NULL,
-    order_number VARCHAR(40) NOT NULL,
-    status VARCHAR(30) NOT NULL DEFAULT 'pending',
-    recipient_name VARCHAR(150) NOT NULL,
-    recipient_phone VARCHAR(30) NOT NULL,
-    shipping_address TEXT NOT NULL,
-    subtotal DECIMAL(12,2) NOT NULL,
-    discount_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
-    shipping_fee DECIMAL(12,2) NOT NULL DEFAULT 0,
-    total DECIMAL(12,2) NOT NULL,
-    note TEXT NULL,
-    placed_at TIMESTAMP NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY orders_order_number_unique (order_number),
-    KEY orders_user_date_index (user_id, created_at),
-    KEY orders_status_date_index (status, created_at),
-    CONSTRAINT orders_user_fk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
-    CONSTRAINT orders_address_fk FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE SET NULL,
-    CONSTRAINT orders_coupon_fk FOREIGN KEY (coupon_id) REFERENCES coupons (id) ON DELETE SET NULL,
-    CONSTRAINT orders_status_check CHECK (status IN ('pending', 'confirmed', 'processing', 'shipped', 'completed', 'cancelled')),
-    CONSTRAINT orders_amounts_check CHECK (subtotal >= 0 AND discount_amount >= 0 AND shipping_fee >= 0 AND total >= 0)
+    MaDonHang BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaNguoiDung BIGINT UNSIGNED NULL,
+    MaDiaChi BIGINT UNSIGNED NULL,
+    MaPhieuGiamGia BIGINT UNSIGNED NULL,
+    SoDonHang VARCHAR(40) NOT NULL,
+    TrangThai VARCHAR(30) NOT NULL DEFAULT 'pending',
+    TenNguoiNhan VARCHAR(150) NOT NULL,
+    SoDienThoaiNguoiNhan VARCHAR(30) NOT NULL,
+    DiaChiGiaoHang TEXT NOT NULL,
+    TamTinh DECIMAL(12,2) NOT NULL,
+    TienGiam DECIMAL(12,2) NOT NULL DEFAULT 0,
+    PhiVanChuyen DECIMAL(12,2) NOT NULL DEFAULT 0,
+    TongTien DECIMAL(12,2) NOT NULL,
+    GhiChu TEXT NULL,
+    DatLuc TIMESTAMP NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaDonHang),
+    UNIQUE KEY orders_order_number_unique (SoDonHang),
+    KEY orders_user_date_index (MaNguoiDung, NgayTao),
+    KEY orders_status_date_index (TrangThai, NgayTao),
+    CONSTRAINT orders_user_fk FOREIGN KEY (MaNguoiDung) REFERENCES users (MaNguoiDung) ON DELETE SET NULL,
+    CONSTRAINT orders_address_fk FOREIGN KEY (MaDiaChi) REFERENCES addresses (MaDiaChi) ON DELETE SET NULL,
+    CONSTRAINT orders_coupon_fk FOREIGN KEY (MaPhieuGiamGia) REFERENCES coupons (MaPhieuGiamGia) ON DELETE SET NULL,
+    CONSTRAINT orders_status_check CHECK (TrangThai IN ('pending', 'confirmed', 'processing', 'shipped', 'completed', 'cancelled')),
+    CONSTRAINT orders_amounts_check CHECK (TamTinh >= 0 AND TienGiam >= 0 AND PhiVanChuyen >= 0 AND TongTien >= 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE order_items (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    order_id BIGINT UNSIGNED NOT NULL,
-    product_id BIGINT UNSIGNED NULL,
-    product_name VARCHAR(200) NOT NULL,
-    sku VARCHAR(80) NOT NULL,
-    unit_price DECIMAL(12,2) NOT NULL,
-    quantity INT UNSIGNED NOT NULL,
-    line_total DECIMAL(12,2) NOT NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY order_items_order_index (order_id),
-    KEY order_items_product_index (product_id),
-    CONSTRAINT order_items_order_fk FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
-    CONSTRAINT order_items_product_fk FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE SET NULL,
-    CONSTRAINT order_items_values_check CHECK (unit_price >= 0 AND quantity > 0 AND line_total >= 0)
+    MaChiTietDonHang BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaDonHang BIGINT UNSIGNED NOT NULL,
+    MaSanPham BIGINT UNSIGNED NULL,
+    TenSanPham VARCHAR(200) NOT NULL,
+    MaSKU VARCHAR(80) NOT NULL,
+    DonGia DECIMAL(12,2) NOT NULL,
+    SoLuong INT UNSIGNED NOT NULL,
+    ThanhTien DECIMAL(12,2) NOT NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaChiTietDonHang),
+    KEY order_items_order_index (MaDonHang),
+    KEY order_items_product_index (MaSanPham),
+    CONSTRAINT order_items_order_fk FOREIGN KEY (MaDonHang) REFERENCES orders (MaDonHang) ON DELETE CASCADE,
+    CONSTRAINT order_items_product_fk FOREIGN KEY (MaSanPham) REFERENCES products (MaSanPham) ON DELETE SET NULL,
+    CONSTRAINT order_items_values_check CHECK (DonGia >= 0 AND SoLuong > 0 AND ThanhTien >= 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE coupon_redemptions (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    coupon_id BIGINT UNSIGNED NOT NULL,
-    user_id BIGINT UNSIGNED NULL,
-    order_id BIGINT UNSIGNED NOT NULL,
-    discount_amount DECIMAL(12,2) NOT NULL,
-    redeemed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY coupon_redemptions_order_unique (order_id),
-    KEY coupon_redemptions_user_coupon_index (user_id, coupon_id),
-    CONSTRAINT coupon_redemptions_coupon_fk FOREIGN KEY (coupon_id) REFERENCES coupons (id) ON DELETE RESTRICT,
-    CONSTRAINT coupon_redemptions_user_fk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
-    CONSTRAINT coupon_redemptions_order_fk FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
-    CONSTRAINT coupon_redemptions_amount_check CHECK (discount_amount >= 0)
+    MaLuotSuDung BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaPhieuGiamGia BIGINT UNSIGNED NOT NULL,
+    MaNguoiDung BIGINT UNSIGNED NULL,
+    MaDonHang BIGINT UNSIGNED NOT NULL,
+    TienGiam DECIMAL(12,2) NOT NULL,
+    SuDungLuc TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaLuotSuDung),
+    UNIQUE KEY coupon_redemptions_order_unique (MaDonHang),
+    KEY coupon_redemptions_user_coupon_index (MaNguoiDung, MaPhieuGiamGia),
+    CONSTRAINT coupon_redemptions_coupon_fk FOREIGN KEY (MaPhieuGiamGia) REFERENCES coupons (MaPhieuGiamGia) ON DELETE RESTRICT,
+    CONSTRAINT coupon_redemptions_user_fk FOREIGN KEY (MaNguoiDung) REFERENCES users (MaNguoiDung) ON DELETE SET NULL,
+    CONSTRAINT coupon_redemptions_order_fk FOREIGN KEY (MaDonHang) REFERENCES orders (MaDonHang) ON DELETE CASCADE,
+    CONSTRAINT coupon_redemptions_amount_check CHECK (TienGiam >= 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE payments (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    order_id BIGINT UNSIGNED NOT NULL,
-    method VARCHAR(30) NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'pending',
-    provider_reference VARCHAR(150) NULL,
-    amount DECIMAL(12,2) NOT NULL,
-    paid_at TIMESTAMP NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY payments_order_index (order_id),
-    UNIQUE KEY payments_provider_reference_unique (provider_reference),
-    CONSTRAINT payments_order_fk FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
-    CONSTRAINT payments_status_check CHECK (status IN ('pending', 'paid', 'failed', 'refunded')),
-    CONSTRAINT payments_amount_check CHECK (amount >= 0)
+    MaThanhToan BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaDonHang BIGINT UNSIGNED NOT NULL,
+    PhuongThuc VARCHAR(30) NOT NULL,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'pending',
+    MaGiaoDichNhaCungCap VARCHAR(150) NULL,
+    SoTien DECIMAL(12,2) NOT NULL,
+    ThanhToanLuc TIMESTAMP NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaThanhToan),
+    KEY payments_order_index (MaDonHang),
+    UNIQUE KEY payments_provider_reference_unique (MaGiaoDichNhaCungCap),
+    CONSTRAINT payments_order_fk FOREIGN KEY (MaDonHang) REFERENCES orders (MaDonHang) ON DELETE CASCADE,
+    CONSTRAINT payments_status_check CHECK (TrangThai IN ('pending', 'paid', 'failed', 'refunded')),
+    CONSTRAINT payments_amount_check CHECK (SoTien >= 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE posts (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    author_id BIGINT UNSIGNED NULL,
-    title VARCHAR(200) NOT NULL,
-    slug VARCHAR(220) NOT NULL,
-    body LONGTEXT NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'draft',
-    published_at TIMESTAMP NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY posts_slug_unique (slug),
-    KEY posts_status_published_index (status, published_at),
-    CONSTRAINT posts_author_fk FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE SET NULL,
-    CONSTRAINT posts_status_check CHECK (status IN ('draft', 'published', 'hidden'))
+    MaBaiViet BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaTacGia BIGINT UNSIGNED NULL,
+    TieuDe VARCHAR(200) NOT NULL,
+    DuongDan VARCHAR(220) NOT NULL,
+    NoiDung LONGTEXT NOT NULL,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'draft',
+    NgayDang TIMESTAMP NULL,
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaBaiViet),
+    UNIQUE KEY posts_slug_unique (DuongDan),
+    KEY posts_status_published_index (TrangThai, NgayDang),
+    CONSTRAINT posts_author_fk FOREIGN KEY (MaTacGia) REFERENCES users (MaNguoiDung) ON DELETE SET NULL,
+    CONSTRAINT posts_status_check CHECK (TrangThai IN ('draft', 'published', 'hidden'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE banners (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    manager_id BIGINT UNSIGNED NULL,
-    title VARCHAR(180) NOT NULL,
-    image_path VARCHAR(500) NOT NULL,
-    target_url VARCHAR(500) NULL,
-    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
-    starts_at DATETIME NULL,
-    expires_at DATETIME NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'inactive',
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY banners_status_order_index (status, sort_order),
-    CONSTRAINT banners_manager_fk FOREIGN KEY (manager_id) REFERENCES users (id) ON DELETE SET NULL,
-    CONSTRAINT banners_status_check CHECK (status IN ('active', 'inactive'))
+    MaBanner BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaNguoiQuanLy BIGINT UNSIGNED NULL,
+    TieuDe VARCHAR(180) NOT NULL,
+    DuongDanHinhAnh VARCHAR(500) NOT NULL,
+    DuongDanDich VARCHAR(500) NULL,
+    ThuTuSapXep INT UNSIGNED NOT NULL DEFAULT 0,
+    BatDauLuc DATETIME NULL,
+    KetThucLuc DATETIME NULL,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'inactive',
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaBanner),
+    KEY banners_status_order_index (TrangThai, ThuTuSapXep),
+    CONSTRAINT banners_manager_fk FOREIGN KEY (MaNguoiQuanLy) REFERENCES users (MaNguoiDung) ON DELETE SET NULL,
+    CONSTRAINT banners_status_check CHECK (TrangThai IN ('active', 'inactive'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE admin_audit_logs (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    actor_id BIGINT UNSIGNED NULL,
-    action VARCHAR(100) NOT NULL,
-    subject_type VARCHAR(100) NOT NULL,
-    subject_id BIGINT UNSIGNED NULL,
-    summary VARCHAR(500) NOT NULL,
-    ip_address VARCHAR(45) NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY admin_audit_actor_date_index (actor_id, created_at),
-    KEY admin_audit_subject_index (subject_type, subject_id),
-    CONSTRAINT admin_audit_actor_fk FOREIGN KEY (actor_id) REFERENCES users (id) ON DELETE SET NULL
+    MaNhatKyQuanTri BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaNguoiThucHien BIGINT UNSIGNED NULL,
+    HanhDong VARCHAR(100) NOT NULL,
+    LoaiDoiTuong VARCHAR(100) NOT NULL,
+    MaDoiTuong BIGINT UNSIGNED NULL,
+    TomTat VARCHAR(500) NOT NULL,
+    DiaChiIP VARCHAR(45) NULL,
+    NgayTao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaNhatKyQuanTri),
+    KEY admin_audit_actor_date_index (MaNguoiThucHien, NgayTao),
+    KEY admin_audit_subject_index (LoaiDoiTuong, MaDoiTuong),
+    CONSTRAINT admin_audit_actor_fk FOREIGN KEY (MaNguoiThucHien) REFERENCES users (MaNguoiDung) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Initial catalog categories.
-INSERT IGNORE INTO categories (name, slug, description, sort_order, status)
+INSERT IGNORE INTO categories (TenDanhMuc, DuongDan, MoTa, ThuTuSapXep, TrangThai)
 VALUES
-    ('Mô hình', 'mo-hinh', 'Mô hình sưu tầm', 1, 'active'),
-    ('Thẻ bài', 'the-bai', 'Thẻ bài sưu tầm', 2, 'active'),
-    ('Phụ kiện', 'phu-kien', 'Phụ kiện cho mô hình và thẻ bài', 3, 'active');
+    ('MoHinh', 'mo-hinh', 'MoHinh suu tam', 1, 'active'),
+    ('TheBai', 'the-bai', 'TheBai suu tam', 2, 'active'),
+    ('PhuKien', 'phu-kien', 'PhuKien cho mo hinh va the bai', 3, 'active');
 
 -- Initial RBAC roles and permissions. Create the first admin user separately
 -- with a securely hashed password; never store a plaintext password here.
-INSERT IGNORE INTO roles (name, display_name)
+INSERT IGNORE INTO roles (TenVaiTro, TenHienThi)
 VALUES
-    ('administrator', 'Quản trị viên'),
-    ('catalog_manager', 'Quản lý sản phẩm'),
-    ('order_staff', 'Nhân viên đơn hàng'),
-    ('content_staff', 'Quản lý nội dung'),
-    ('analyst', 'Nhân viên thống kê'),
-    ('customer', 'Khách hàng');
+    ('administrator', 'QuanTriVien'),
+    ('catalog_manager', 'QuanLySanPham'),
+    ('order_staff', 'NhanVienDonHang'),
+    ('content_staff', 'QuanLyNoiDung'),
+    ('analyst', 'NhanVienThongKe'),
+    ('customer', 'KhachHang');
 
-INSERT IGNORE INTO permissions (name, display_name)
+INSERT IGNORE INTO permissions (TenQuyen, TenHienThi)
 VALUES
-    ('products.view', 'Xem sản phẩm'),
-    ('products.create', 'Thêm sản phẩm'),
-    ('products.update', 'Sửa sản phẩm'),
-    ('products.delete', 'Ẩn sản phẩm'),
-    ('categories.manage', 'Quản lý danh mục'),
-    ('orders.view', 'Xem đơn hàng'),
-    ('orders.update-status', 'Cập nhật trạng thái đơn hàng'),
-    ('customers.view', 'Xem khách hàng'),
-    ('customers.lock', 'Khóa tài khoản khách hàng'),
-    ('coupons.manage', 'Quản lý khuyến mãi'),
-    ('content.manage', 'Quản lý bài viết và banner'),
-    ('reports.view', 'Xem báo cáo'),
-    ('users.manage', 'Quản lý tài khoản và phân quyền'),
-    ('orders.view-own', 'Xem đơn hàng của mình');
+    ('products.view', 'XemSanPham'),
+    ('products.create', 'ThemSanPham'),
+    ('products.update', 'SuaSanPham'),
+    ('products.delete', 'AnSanPham'),
+    ('categories.manage', 'QuanLyDanhMuc'),
+    ('orders.view', 'XemDonHang'),
+    ('orders.update-status', 'CapNhatTrangThaiDonHang'),
+    ('customers.view', 'XemKhachHang'),
+    ('customers.lock', 'KhoaTaiKhoanKhachHang'),
+    ('coupons.manage', 'QuanLyKhuyenMai'),
+    ('content.manage', 'QuanLyBaiVietVaBanner'),
+    ('reports.view', 'XemBaoCao'),
+    ('users.manage', 'QuanLyTaiKhoanVaPhanQuyen'),
+    ('orders.view-own', 'XemDonHangCuaMinh');
 
-INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
+INSERT IGNORE INTO role_permissions (MaVaiTro, MaQuyen)
+SELECT r.MaVaiTro, p.MaQuyen
 FROM roles r
 CROSS JOIN permissions p
-WHERE r.name = 'administrator';
+WHERE r.TenVaiTro = 'administrator';
 
-INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
+INSERT IGNORE INTO role_permissions (MaVaiTro, MaQuyen)
+SELECT r.MaVaiTro, p.MaQuyen
 FROM roles r
-JOIN permissions p ON p.name IN (
+JOIN permissions p ON p.TenQuyen IN (
     'products.view', 'products.create', 'products.update',
     'products.delete', 'categories.manage'
 )
-WHERE r.name = 'catalog_manager';
+WHERE r.TenVaiTro = 'catalog_manager';
 
-INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
+INSERT IGNORE INTO role_permissions (MaVaiTro, MaQuyen)
+SELECT r.MaVaiTro, p.MaQuyen
 FROM roles r
-JOIN permissions p ON p.name IN (
+JOIN permissions p ON p.TenQuyen IN (
     'orders.view', 'orders.update-status', 'customers.view'
 )
-WHERE r.name = 'order_staff';
+WHERE r.TenVaiTro = 'order_staff';
 
-INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
+INSERT IGNORE INTO role_permissions (MaVaiTro, MaQuyen)
+SELECT r.MaVaiTro, p.MaQuyen
 FROM roles r
-JOIN permissions p ON p.name = 'content.manage'
-WHERE r.name = 'content_staff';
+JOIN permissions p ON p.TenQuyen = 'content.manage'
+WHERE r.TenVaiTro = 'content_staff';
 
-INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
+INSERT IGNORE INTO role_permissions (MaVaiTro, MaQuyen)
+SELECT r.MaVaiTro, p.MaQuyen
 FROM roles r
-JOIN permissions p ON p.name = 'reports.view'
-WHERE r.name = 'analyst';
+JOIN permissions p ON p.TenQuyen = 'reports.view'
+WHERE r.TenVaiTro = 'analyst';
 
-INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
+INSERT IGNORE INTO role_permissions (MaVaiTro, MaQuyen)
+SELECT r.MaVaiTro, p.MaQuyen
 FROM roles r
-JOIN permissions p ON p.name = 'orders.view-own'
-WHERE r.name = 'customer';
+JOIN permissions p ON p.TenQuyen = 'orders.view-own'
+WHERE r.TenVaiTro = 'customer';
