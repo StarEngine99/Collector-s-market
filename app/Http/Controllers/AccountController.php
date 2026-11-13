@@ -141,3 +141,4 @@ class AccountController extends Controller
         return back()->with('success', $result['message']);
     }
 }
+

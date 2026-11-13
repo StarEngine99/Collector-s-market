@@ -18,3 +18,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:customers.view'
         ->middleware('can:customers.lock')
         ->name('customers.status');
 });
+

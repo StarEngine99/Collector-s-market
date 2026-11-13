@@ -26,3 +26,4 @@ Route::middleware('auth')
             ->where('orderNumber', '[A-Za-z0-9-]+')
             ->name('orders.cancel');
     });
+

@@ -33,3 +33,4 @@ Route::middleware(['auth', 'can:orders.view'])
             ->middleware('can:orders.update-status')
             ->name('orders.payment');
     });
+
