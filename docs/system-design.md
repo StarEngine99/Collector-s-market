@@ -48,12 +48,12 @@ Controller không chứa truy vấn/logic nghiệp vụ phức tạp. Các thao 
 
 ## 3. Phân quyền
 
-Dùng RBAC: `users` ↔ `roles` ↔ `permissions`, qua các bảng nối. Tên quyền có dạng `products.view`, `products.create`, `products.update`, `products.delete`, `categories.manage`, `orders.update-status`, `customers.lock`, `coupons.manage`, `content.manage`, `reports.view`, `users.manage`.
+Dùng RBAC: `users` ↔ `roles` ↔ `permissions`, qua các bảng nối. Kiểm tra quyền theo từng thao tác ở middleware/policy phía máy chủ; riêng dữ liệu theo chủ sở hữu phải kiểm tra thêm user ID, không chỉ role. Các quyền catalog được tách thành `products.view/create/update/delete`, `categories.view/create/update/delete` và `inventory.view/adjust`; quyền `*.delete` trong giao diện là ẩn/ngừng sử dụng (soft delete), không xóa cứng dữ liệu đã được tham chiếu.
 
 | Vai trò đề xuất | Quyền |
 |---|---|
-| `administrator` | Toàn quyền; quản lý tài khoản nội bộ, vai trò/quyền và cấu hình |
-| `catalog_manager` | Xem/thêm/sửa sản phẩm, danh mục và ảnh; không quản lý tài khoản |
+| `administrator` | Toàn quyền, bao gồm quản lý tài khoản nội bộ, vai trò/quyền và cấu hình |
+| `catalog_manager` | Xem/thêm/sửa/ẩn sản phẩm và danh mục; quản lý ảnh, xem và điều chỉnh tồn kho; không quản lý tài khoản |
 | `order_staff` | Xem đơn và cập nhật trạng thái theo quy trình; xem thông tin giao hàng cần thiết |
 | `content_staff` | Quản lý bài viết/banner |
 | `analyst` | Chỉ xem báo cáo được phép, không sửa dữ liệu |
@@ -63,24 +63,45 @@ Khởi tạo admin qua seeder hoặc lệnh thiết lập có mật khẩu cấu
 
 ## 4. Quản trị sản phẩm và danh mục
 
+### Điều hướng và màn hình
+
+Khu vực `/admin` chỉ cho phép phiên đăng nhập có quyền phù hợp. Menu hiển thị theo quyền; mọi route vẫn phải được bảo vệ ở máy chủ kể cả khi người dùng gọi URL trực tiếp.
+
+| Màn hình | Nội dung và thao tác |
+|---|---|
+| Sản phẩm (`/admin/products`) | Tìm tên/SKU; lọc danh mục, trạng thái, giá; phân trang; cột ảnh đại diện, tên/SKU, danh mục, giá, tồn kho, trạng thái; thao tác xem/sửa/ẩn theo quyền |
+| Tạo/sửa sản phẩm (`/admin/products/create`, `/admin/products/{id}/edit`) | Tên, SKU, slug, danh mục, mô tả, giá, trạng thái, nổi bật và nhiều ảnh; hiển thị lỗi sát trường nhập; lưu nháp hoặc kích hoạt |
+| Danh mục (`/admin/categories`) | Danh sách dạng cây; tên, slug, danh mục cha, thứ tự, trạng thái và số sản phẩm; tìm kiếm, thêm/sửa/ẩn |
+| Tạo/sửa danh mục (`/admin/categories/create`, `/admin/categories/{id}/edit`) | Tên, slug, mô tả, danh mục cha, thứ tự hiển thị, trạng thái; không cho chọn chính nó hoặc hậu duệ làm danh mục cha |
+
+Nút hành động bị ẩn khi thiếu quyền để giao diện rõ ràng, nhưng đây chỉ là UX; server vẫn trả `403` nếu request không được phép. Trạng thái rỗng, đang tải, lỗi tải danh sách và kết quả lọc rỗng cần có thông báo riêng.
+
 ### Sản phẩm
 
 - Danh sách: phân trang; tìm theo tên/SKU; lọc danh mục, trạng thái và khoảng giá; hiển thị tồn kho.
 - Tạo/sửa: tên, slug, SKU, danh mục, mô tả, giá, tồn kho, trạng thái và nhiều ảnh; xác thực ở Form Request và kiểm tra quyền ở Policy.
 - Ảnh: kiểm tra MIME/kích thước, đổi tên file, lưu trên filesystem hoặc object storage; chỉ lưu đường dẫn trong DB; xóa/thay ảnh phải xử lý file cũ an toàn.
-- Xóa: ưu tiên ẩn/ngừng bán hoặc soft delete; không xóa cứng sản phẩm đã nằm trong đơn.
-- Tồn kho: chỉnh số lượng có quyền hạn và ghi nhận lý do/thao tác; checkout phải kiểm tra lại tồn ở server.
+- Ẩn: yêu cầu xác nhận, đặt `deleted_at`/trạng thái ẩn thay vì xóa cứng; không xóa sản phẩm đã nằm trong đơn. Thay đổi trạng thái không tự làm mất bản ghi lịch sử đơn.
+- Tồn kho: màn chỉnh tồn yêu cầu số lượng thay đổi và lý do; ghi thay đổi sản phẩm cùng `inventory_movements` trong một transaction. Checkout phải kiểm tra lại tồn ở server.
 
 ### Danh mục
 
 - CRUD tên, slug, danh mục cha, thứ tự hiển thị và trạng thái.
 - Slug duy nhất; chống tự chọn làm cha và chu trình cha-con.
-- Không xóa danh mục còn sản phẩm đang hoạt động hoặc danh mục con; hướng dẫn admin chuyển sản phẩm trước khi xóa.
+- Không ẩn/xóa danh mục còn sản phẩm đang hoạt động hoặc danh mục con; trả thông báo để admin chuyển sản phẩm/con sang nơi khác trước khi thử lại. Ràng buộc vòng lặp cây phải được kiểm tra trong nghiệp vụ, không chỉ dựa vào foreign key.
 - Có thể seed các danh mục ban đầu: Mô hình, Thẻ bài, Phụ kiện.
 
 ### Luồng lỗi và audit
 
 Trả lỗi xác thực theo trường; báo rõ lỗi trùng SKU/slug, ảnh không hợp lệ, hoặc danh mục đang được sử dụng. Ghi audit log cho thay đổi giá, tồn kho, trạng thái sản phẩm/danh mục và quyền tài khoản; không ghi mật khẩu hoặc token.
+
+### Tiêu chí nghiệm thu cho phạm vi TV1
+
+- Người chưa đăng nhập bị chuyển tới trang đăng nhập; người đăng nhập nhưng thiếu quyền nhận `403` ở mọi thao tác quản trị tương ứng.
+- Người có quyền tạo/sửa/ẩn sản phẩm và danh mục; SKU/slug trùng, giá âm, ảnh sai định dạng, danh mục cha không hợp lệ đều bị từ chối có thông báo.
+- Bộ lọc và phân trang giữ trạng thái truy vấn; không hiển thị sản phẩm thuộc danh mục ẩn ở storefront.
+- Chỉnh tồn kho tạo đúng một bản ghi biến động kèm người thao tác/lý do; lỗi giữa chừng không để tồn kho và lịch sử lệch nhau.
+- Sản phẩm đã có trong đơn vẫn giữ snapshot tên/SKU/giá và không bị xóa cứng.
 
 ## 5. Quản lý mã nguồn mở
 

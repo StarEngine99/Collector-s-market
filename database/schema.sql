@@ -1,11 +1,11 @@
 -- MySQL 8.0+ schema for a model and trading-card store.
 -- Import with: mysql -u root -p < database/schema.sql
 
-CREATE DATABASE IF NOT EXISTS ChoFigureThe
+CREATE DATABASE IF NOT EXISTS model_store
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE ChoFigureThe;
+USE model_store;
 
 CREATE TABLE users (
     MaNguoiDung BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -358,37 +358,42 @@ CREATE TABLE admin_audit_logs (
 -- Initial catalog categories.
 INSERT IGNORE INTO categories (TenDanhMuc, DuongDan, MoTa, ThuTuSapXep, TrangThai)
 VALUES
-    ('MoHinh', 'mo-hinh', 'MoHinh suu tam', 1, 'active'),
-    ('TheBai', 'the-bai', 'TheBai suu tam', 2, 'active'),
-    ('PhuKien', 'phu-kien', 'PhuKien cho mo hinh va the bai', 3, 'active');
+    ('Mô hình', 'mo-hinh', 'Mô hình sưu tầm', 1, 'active'),
+    ('Thẻ bài', 'the-bai', 'Thẻ bài sưu tầm', 2, 'active'),
+    ('Phụ kiện', 'phu-kien', 'Phụ kiện cho mô hình và thẻ bài', 3, 'active');
 
 -- Initial RBAC roles and permissions. Create the first admin user separately
 -- with a securely hashed password; never store a plaintext password here.
 INSERT IGNORE INTO roles (TenVaiTro, TenHienThi)
 VALUES
-    ('administrator', 'QuanTriVien'),
-    ('catalog_manager', 'QuanLySanPham'),
-    ('order_staff', 'NhanVienDonHang'),
-    ('content_staff', 'QuanLyNoiDung'),
-    ('analyst', 'NhanVienThongKe'),
-    ('customer', 'KhachHang');
+    ('administrator', 'Quản trị viên'),
+    ('catalog_manager', 'Quản lý danh mục'),
+    ('order_staff', 'Nhân viên đơn hàng'),
+    ('content_staff', 'Quản lý nội dung'),
+    ('analyst', 'Nhân viên thống kê'),
+    ('customer', 'Khách hàng');
 
 INSERT IGNORE INTO permissions (TenQuyen, TenHienThi)
 VALUES
-    ('products.view', 'XemSanPham'),
-    ('products.create', 'ThemSanPham'),
-    ('products.update', 'SuaSanPham'),
-    ('products.delete', 'AnSanPham'),
-    ('categories.manage', 'QuanLyDanhMuc'),
-    ('orders.view', 'XemDonHang'),
-    ('orders.update-status', 'CapNhatTrangThaiDonHang'),
-    ('customers.view', 'XemKhachHang'),
-    ('customers.lock', 'KhoaTaiKhoanKhachHang'),
-    ('coupons.manage', 'QuanLyKhuyenMai'),
-    ('content.manage', 'QuanLyBaiVietVaBanner'),
-    ('reports.view', 'XemBaoCao'),
-    ('users.manage', 'QuanLyTaiKhoanVaPhanQuyen'),
-    ('orders.view-own', 'XemDonHangCuaMinh');
+    ('products.view', 'Xem sản phẩm'),
+    ('products.create', 'Thêm sản phẩm'),
+    ('products.update', 'Sửa sản phẩm'),
+    ('products.delete', 'Ẩn sản phẩm'),
+    ('categories.view', 'Xem danh mục'),
+    ('categories.create', 'Thêm danh mục'),
+    ('categories.update', 'Sửa danh mục'),
+    ('categories.delete', 'Ẩn danh mục'),
+    ('inventory.view', 'Xem tồn kho'),
+    ('inventory.adjust', 'Điều chỉnh tồn kho'),
+    ('orders.view', 'Xem đơn hàng'),
+    ('orders.update-status', 'Cập nhật trạng thái đơn hàng'),
+    ('customers.view', 'Xem khách hàng'),
+    ('customers.lock', 'Khóa tài khoản khách hàng'),
+    ('coupons.manage', 'Quản lý khuyến mãi'),
+    ('content.manage', 'Quản lý bài viết và banner'),
+    ('reports.view', 'Xem báo cáo'),
+    ('users.manage', 'Quản lý tài khoản và phân quyền'),
+    ('orders.view-own', 'Xem đơn hàng của mình');
 
 INSERT IGNORE INTO role_permissions (MaVaiTro, MaQuyen)
 SELECT r.MaVaiTro, p.MaQuyen
@@ -401,7 +406,9 @@ SELECT r.MaVaiTro, p.MaQuyen
 FROM roles r
 JOIN permissions p ON p.TenQuyen IN (
     'products.view', 'products.create', 'products.update',
-    'products.delete', 'categories.manage'
+    'products.delete',
+    'categories.view', 'categories.create', 'categories.update', 'categories.delete',
+    'inventory.view', 'inventory.adjust'
 )
 WHERE r.TenVaiTro = 'catalog_manager';
 
