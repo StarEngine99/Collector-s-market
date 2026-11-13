@@ -1,0 +1,16 @@
+/* Style tùy chỉnh nhẹ cho layout chung (C4) */
+
+.storefront-search-form {
+    min-width: 240px;
+}
+
+.footer-link:hover {
+    color: #ffffff !important;
+    text-decoration: underline !important;
+}
+
+@media (max-width: 991.98px) {
+    .storefront-search-form {
+        width: 100%;
+    }
+}
