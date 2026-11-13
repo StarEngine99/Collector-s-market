@@ -13,6 +13,8 @@ require __DIR__ . '/admin_reports.php';
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin_promotions.php';
 require __DIR__ . '/cart_checkout.php';
+require __DIR__ . '/admin_orders.php';
+
 
 
 
