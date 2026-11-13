@@ -40,7 +40,7 @@ class CustomerManagementService
                     ->from('user_roles as ur')
                     ->join('roles as r', 'r.MaVaiTro', '=', 'ur.MaVaiTro')
                     ->whereColumn('ur.MaNguoiDung', 'u.MaNguoiDung')
-                    ->whereIn('r.TenVaiTro', ['administrator', 'staff', 'warehouse_staff', 'order_staff', 'marketing_staff']);
+                    ->where('r.TenVaiTro', '<>', 'customer');
             })
             ->select([
                 'u.MaNguoiDung',
