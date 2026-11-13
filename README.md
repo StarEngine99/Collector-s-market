@@ -33,3 +33,59 @@ Sao chép các biến mẫu từ [`.env.example`](.env.example) vào file `.env`
      - `BANK_TRANSFER_ACCOUNT_HOLDER`
      - `BANK_TRANSFER_BRANCH`
    - Trong `.env.example` chỉ lưu giá trị giả; điền thông tin tài khoản thật vào `.env` nội bộ khi chạy demo.
+
+---
+
+## Hướng dẫn cài đặt nhanh & nạp dữ liệu mẫu (D4 – TV3)
+
+### 1. Các bước cài đặt nhanh
+
+```bash
+# Bước 1: Cài đặt thư viện PHP (nếu chạy trên khung Laravel đầy đủ)
+composer install
+
+# Bước 2: Tạo file .env từ .env.example và sinh APP_KEY
+cp .env.example .env
+php artisan key:generate
+
+# Bước 3: Khởi tạo CSDL lõi của nhóm (TV1)
+mysql -u root -p < database/schema.sql
+
+# Bước 4: Chạy các migration bổ sung của TV3
+# (Tạo bảng password_reset_tokens cho A6 và cập nhật 7 trạng thái đơn hàng cho A5/B3/A7)
+php artisan migrate
+
+# Bước 5: Nạp dữ liệu mẫu (Tài khoản, Sản phẩm, Khuyến mãi, Mã giảm giá, Đơn hàng mẫu)
+php artisan db:seed --class=Database\\Seeders\\Tv3DemoSeeder
+
+# Bước 6: Khởi chạy máy chủ phát triển
+php artisan serve
+```
+
+### 2. Danh sách tài khoản mẫu (Seed Data – `Tv3DemoSeeder`)
+
+| Vai trò | Email đăng nhập | Mật khẩu | Trạng thái | Ghi chú |
+| :--- | :--- | :--- | :--- | :--- |
+| **Quản trị viên (`administrator`)** | `admin@collectorsmarket.local` | `Admin@123456` | `active` | Toàn quyền quản trị (B3, B4, B5...) |
+| **Nhân viên đơn hàng (`order_staff`)** | `orderstaff@collectorsmarket.local` | `Staff@123456` | `active` | Quyền xem/cập nhật đơn hàng & xem khách hàng |
+| **Khách hàng 1 (`customer`)** | `khachhang1@collectorsmarket.local` | `Customer@123456` | `active` | Có sẵn đơn `CM202611130001` (`preparing`) và `CM202611130002` (`shipping`) |
+| **Khách hàng 2 (`customer`)** | `khachhang2@collectorsmarket.local` | `Customer@123456` | `active` | Có sẵn đơn `CM202611130003` (`completed`) |
+| **Khách hàng bị khóa (`customer`)** | `khachkhoa@collectorsmarket.local` | `Customer@123456` | `locked` | Dùng để kiểm thử chặn đăng nhập tài khoản bị khóa (A6, B4) |
+
+### 3. Mã giảm giá mẫu (`coupons`)
+
+- `COLLECTOR10`: Giảm **10%** (tối đa `100.000 đ`) cho đơn hàng có tạm tính từ `300.000 đ`.
+- `GIAM50K`: Giảm cố định **50.000 đ** cho đơn hàng có tạm tính từ `500.000 đ`.
+- `EXPIRED20`: Mã giảm giá đã hết hạn (dùng để kiểm thử thông báo lỗi mã hết hạn).
+
+### 4. Chạy kiểm thử tự động (Feature Tests – TV3)
+
+```bash
+php artisan test --filter=AuthTest
+php artisan test --filter=PromotionAndCouponAdminTest
+php artisan test --filter=CartAndCheckoutTest
+php artisan test --filter=OrderManagementAdminTest
+php artisan test --filter=AccountAndOrderHistoryTest
+php artisan test --filter=CustomerManagementAdminTest
+```
+
