@@ -6,6 +6,7 @@ The initial database schema and design documents for the model and trading-card 
 
 - [MySQL schema](database/schema.sql) - creates the `model_store` database, tables, foreign keys, and initial categories/roles/permissions.
 - [System design](docs/system-design.md) - core architecture, access control, and product/category administration design.
+- [Product admin UI prototype](docs/admin-products-prototype.html) - clickable, browser-only mockup for product management, image uploads, stock, sales, and reviews.
 - [Data architecture and ERD](.github/modernize/assessment/engines/facts/data-architecture.md) - proposed entity model and Mermaid ER diagram.
 
 ### Create the database

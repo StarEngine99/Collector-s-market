@@ -119,7 +119,7 @@ CREATE TABLE products (
     KEY products_published_index (NgayDang),
     CONSTRAINT products_category_fk FOREIGN KEY (MaDanhMuc) REFERENCES categories (MaDanhMuc) ON DELETE RESTRICT,
     CONSTRAINT products_price_check CHECK (Gia >= 0),
-    CONSTRAINT products_status_check CHECK (TrangThai IN ('draft', 'active', 'out_of_stock', 'hidden'))
+    CONSTRAINT products_status_check CHECK (TrangThai IN ('draft', 'active', 'hidden'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE product_images (
@@ -251,6 +251,26 @@ CREATE TABLE orders (
     CONSTRAINT orders_coupon_fk FOREIGN KEY (MaPhieuGiamGia) REFERENCES coupons (MaPhieuGiamGia) ON DELETE SET NULL,
     CONSTRAINT orders_status_check CHECK (TrangThai IN ('pending', 'confirmed', 'processing', 'shipped', 'completed', 'cancelled')),
     CONSTRAINT orders_amounts_check CHECK (TamTinh >= 0 AND TienGiam >= 0 AND PhiVanChuyen >= 0 AND TongTien >= 0)
+) ENGINE=InnoDB;
+
+CREATE TABLE product_reviews (
+    MaDanhGia BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    MaSanPham BIGINT UNSIGNED NOT NULL,
+    MaNguoiDung BIGINT UNSIGNED NULL,
+    MaDonHang BIGINT UNSIGNED NULL,
+    SoSao TINYINT UNSIGNED NOT NULL,
+    NoiDung TEXT NULL,
+    TrangThai VARCHAR(20) NOT NULL DEFAULT 'pending',
+    NgayTao TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (MaDanhGia),
+    UNIQUE KEY product_reviews_user_product_unique (MaNguoiDung, MaSanPham),
+    KEY product_reviews_product_status_date_index (MaSanPham, TrangThai, NgayTao),
+    CONSTRAINT product_reviews_product_fk FOREIGN KEY (MaSanPham) REFERENCES products (MaSanPham) ON DELETE CASCADE,
+    CONSTRAINT product_reviews_user_fk FOREIGN KEY (MaNguoiDung) REFERENCES users (MaNguoiDung) ON DELETE SET NULL,
+    CONSTRAINT product_reviews_order_fk FOREIGN KEY (MaDonHang) REFERENCES orders (MaDonHang) ON DELETE SET NULL,
+    CONSTRAINT product_reviews_rating_check CHECK (SoSao BETWEEN 1 AND 5),
+    CONSTRAINT product_reviews_status_check CHECK (TrangThai IN ('pending', 'published', 'rejected'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE order_items (

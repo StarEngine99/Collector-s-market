@@ -15,7 +15,7 @@ Schema được tạo/cập nhật bằng migration, không tự sinh từ model
 | Service | Tables Owned | ORM Framework | Caching | Notes |
 |---|---|---|---|---|
 | Identity & Access | `users`, `roles`, `permissions`, `user_roles`, `role_permissions`, `admin_audit_logs` | Laravel Eloquent | Chưa cần ở phiên bản đầu | Chính sách truy cập được kiểm tra phía máy chủ |
-| Catalog | `categories`, `products`, `product_images` | Laravel Eloquent | Có thể cache danh mục/chi tiết công khai sau khi đo tải | Catalog sở hữu dữ liệu sản phẩm và phân loại |
+| Catalog | `categories`, `products`, `product_images`, `product_reviews` | Laravel Eloquent | Có thể cache danh mục/chi tiết công khai sau khi đo tải | Số đã bán được tổng hợp từ đơn hoàn tất; điểm trung bình tính từ đánh giá đã duyệt |
 | Cart & Orders | `carts`, `cart_items`, `orders`, `order_items`, `payments`, `addresses` | Laravel Eloquent | Cart có thể lưu DB; Redis chỉ là lựa chọn mở rộng | Order item giữ snapshot tên/SKU/giá tại thời điểm đặt |
 | Promotions | `promotions`, `promotion_products`, `coupons`, `coupon_redemptions` | Laravel Eloquent | Chưa cần ở phiên bản đầu | Lưu chương trình theo sản phẩm và lượt sử dụng mã |
 | Content & Storefront | `posts`, `banners` | Laravel Eloquent | Có thể cache nội dung đã xuất bản | Chỉ dữ liệu đã xuất bản được hiển thị công khai |
@@ -37,12 +37,15 @@ erDiagram
     categories o|--o{ categories : "parent has children"
     categories ||--o{ products : "classifies"
     products ||--o{ product_images : "has"
+    products ||--o{ product_reviews : "receives"
     users ||--o{ carts : "owns"
     carts ||--o{ cart_items : "contains"
     products ||--o{ cart_items : "selected as"
     users ||--o{ orders : "places"
     addresses o|--o{ orders : "used for delivery"
     coupons o|--o{ orders : "applied to"
+    users o|--o{ product_reviews : "writes"
+    orders o|--o{ product_reviews : "verifies purchase"
     promotions ||--o{ promotion_products : "targets"
     products ||--o{ promotion_products : "discounted by"
     coupons ||--o{ coupon_redemptions : "redeemed through"
@@ -101,6 +104,14 @@ erDiagram
         string name
         decimal price
         int stock_quantity
+        string status
+    }
+    product_reviews {
+        bigint id PK
+        bigint product_id FK
+        bigint user_id FK
+        bigint order_id FK
+        int rating
         string status
     }
     product_images {

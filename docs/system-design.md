@@ -69,8 +69,9 @@ Khu vực `/admin` chỉ cho phép phiên đăng nhập có quyền phù hợp. 
 
 | Màn hình | Nội dung và thao tác |
 |---|---|
-| Sản phẩm (`/admin/products`) | Tìm tên/SKU; lọc danh mục, trạng thái, giá; phân trang; cột ảnh đại diện, tên/SKU, danh mục, giá, tồn kho, trạng thái; thao tác xem/sửa/ẩn theo quyền |
-| Tạo/sửa sản phẩm (`/admin/products/create`, `/admin/products/{id}/edit`) | Tên, SKU, slug, danh mục, mô tả, giá, trạng thái, nổi bật và nhiều ảnh; hiển thị lỗi sát trường nhập; lưu nháp hoặc kích hoạt |
+| Sản phẩm (`/admin/products`) | Tìm tên/SKU; lọc danh mục, tình trạng hàng/trạng thái hiển thị, giá; phân trang; cột ảnh đại diện, tên/SKU, danh mục, giá, tồn kho, số lượng đã bán, điểm đánh giá/lượt đánh giá; thao tác xem/sửa/ẩn theo quyền |
+| Tạo/sửa sản phẩm (`/admin/products/create`, `/admin/products/{id}/edit`) | Tên, SKU, slug, danh mục, mô tả, giá, số lượng tồn, trạng thái hiển thị và 0–5 ảnh; hiển thị lỗi sát trường nhập; xem số lượng đã bán/đánh giá dạng chỉ đọc |
+| Đánh giá sản phẩm | Điểm trung bình và các đánh giá đã duyệt; dữ liệu tổng hợp từ `product_reviews`, không nhập điểm thủ công ở form sản phẩm |
 | Danh mục (`/admin/categories`) | Danh sách dạng cây; tên, slug, danh mục cha, thứ tự, trạng thái và số sản phẩm; tìm kiếm, thêm/sửa/ẩn |
 | Tạo/sửa danh mục (`/admin/categories/create`, `/admin/categories/{id}/edit`) | Tên, slug, mô tả, danh mục cha, thứ tự hiển thị, trạng thái; không cho chọn chính nó hoặc hậu duệ làm danh mục cha |
 
@@ -79,9 +80,11 @@ Nút hành động bị ẩn khi thiếu quyền để giao diện rõ ràng, nh
 ### Sản phẩm
 
 - Danh sách: phân trang; tìm theo tên/SKU; lọc danh mục, trạng thái và khoảng giá; hiển thị tồn kho.
-- Tạo/sửa: tên, slug, SKU, danh mục, mô tả, giá, tồn kho, trạng thái và nhiều ảnh; xác thực ở Form Request và kiểm tra quyền ở Policy.
+- Tạo/sửa: tên, slug, SKU, danh mục, mô tả, giá, tồn kho, trạng thái hiển thị và 0–5 ảnh; xác thực ở Form Request và kiểm tra quyền ở Policy.
 - Ảnh: kiểm tra MIME/kích thước, đổi tên file, lưu trên filesystem hoặc object storage; chỉ lưu đường dẫn trong DB; xóa/thay ảnh phải xử lý file cũ an toàn.
 - Ẩn: yêu cầu xác nhận, đặt `deleted_at`/trạng thái ẩn thay vì xóa cứng; không xóa sản phẩm đã nằm trong đơn. Thay đổi trạng thái không tự làm mất bản ghi lịch sử đơn.
+- Còn/hết hàng được suy ra từ `SoLuongTon > 0` hay `SoLuongTon = 0`; quản trị viên chỉnh số lượng tồn, không chọn trạng thái hết hàng độc lập. Trạng thái hiển thị (đang bán/bản nháp/ẩn) là trường riêng.
+- Số lượng đã bán là tổng `order_items.SoLuong` của các đơn `completed`, không lưu bộ đếm có thể lệch dữ liệu đơn. Điểm trung bình/lượt đánh giá lấy từ các bản ghi `product_reviews` có trạng thái `published`.
 - Tồn kho: màn chỉnh tồn yêu cầu số lượng thay đổi và lý do; ghi thay đổi sản phẩm cùng `inventory_movements` trong một transaction. Checkout phải kiểm tra lại tồn ở server.
 
 ### Danh mục
@@ -102,6 +105,8 @@ Trả lỗi xác thực theo trường; báo rõ lỗi trùng SKU/slug, ảnh kh
 - Bộ lọc và phân trang giữ trạng thái truy vấn; không hiển thị sản phẩm thuộc danh mục ẩn ở storefront.
 - Chỉnh tồn kho tạo đúng một bản ghi biến động kèm người thao tác/lý do; lỗi giữa chừng không để tồn kho và lịch sử lệch nhau.
 - Sản phẩm đã có trong đơn vẫn giữ snapshot tên/SKU/giá và không bị xóa cứng.
+- Form sản phẩm cho phép lưu 0–5 ảnh, thay/gỡ ảnh; trạng thái còn/hết hàng thay đổi đúng theo số tồn.
+- Số đã bán và điểm đánh giá chỉ đọc, khớp với dữ liệu đơn hoàn tất và đánh giá đã duyệt.
 
 ## 5. Quản lý mã nguồn mở
 
