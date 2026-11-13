@@ -148,6 +148,30 @@
     .review-summary strong { font-size: 21px; }
     .toast { position: fixed; right: 22px; bottom: 22px; z-index: 10; padding: 12px 16px; border-radius: 8px; color: white; background: #203050; box-shadow: 0 8px 25px #10172a30; }
     .toast[hidden] { display: none; }
+    .app-page[hidden] { display: none; }
+    .chart-panel { padding: 19px; }
+    .chart-title { margin: 0; font-size: 15px; }
+    .chart-subtitle { margin: 5px 0 17px; color: var(--muted); font-size: 12px; }
+    .chart-bars { display: grid; height: 190px; grid-template-columns: repeat(7, 1fr); align-items: end; gap: 12px; padding: 8px 6px 0; border-bottom: 1px solid var(--line); background: repeating-linear-gradient(to bottom, transparent 0, transparent 45px, #eef0f5 46px); }
+    .chart-column { display: flex; height: 100%; flex-direction: column; justify-content: flex-end; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; }
+    .chart-bar { width: min(42px, 70%); min-height: 7px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg,#8290ff,#5368e8); }
+    .dashboard-grid { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(270px,1fr); gap: 16px; margin-bottom: 16px; }
+    .dashboard-list { margin-top: 12px; }
+    .dashboard-list .table-wrap { margin: 0 -4px; }
+    .notice { margin-bottom: 15px; padding: 12px 14px; border: 1px solid #e4e8fb; border-radius: 8px; color: #536080; background: #f7f8ff; font-size: 12px; line-height: 1.55; }
+    .category-icon { display: grid; width: 39px; height: 39px; place-items: center; border-radius: 10px; color: var(--blue); background: var(--blue-soft); font-size: 18px; }
+    .inline-select { min-width: 133px; height: 32px; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: white; }
+    .tag { display: inline-flex; padding: 4px 8px; border-radius: 6px; color: #536080; background: #f0f2f7; font-size: 10px; font-weight: 700; }
+    .setting-grid { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 18px; }
+    .settings-menu { padding: 9px; }
+    .settings-tab { display: block; width: 100%; margin: 3px 0; padding: 10px; border: 0; border-radius: 7px; color: #65708a; background: transparent; text-align: left; }
+    .settings-tab.active { color: var(--blue); background: var(--blue-soft); font-weight: 700; }
+    .settings-content { padding: 22px; }
+    .settings-content h2 { margin: 0 0 5px; font-size: 16px; }
+    .settings-content > p { margin: 0 0 20px; color: var(--muted); font-size: 12px; }
+    .settings-content .field { max-width: 520px; margin-bottom: 15px; }
+    .review-admin-copy { max-width: 390px; white-space: normal; color: #65708a; font-size: 12px; line-height: 1.45; }
+    .status-select { border-color: transparent; font-size: 11px; font-weight: 700; }
     @media (max-width: 1050px) {
       .sidebar { width: 205px; }
       .main { margin-left: 205px; }
@@ -155,10 +179,11 @@
       .stats { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 700px) {
-      .sidebar { position: static; width: 100%; height: auto; padding: 12px 14px; }
-      .brand { padding-bottom: 7px; }
-      .sidebar .nav-label, .sidebar .nav-item:not(.active), .sidebar-footer { display: none; }
-      .sidebar .nav-item.active { width: max-content; margin-left: 2px; padding: 7px 10px; }
+      .sidebar { position: static; display: flex; width: 100%; height: auto; flex-direction: row; align-items: center; gap: 4px; overflow-x: auto; padding: 10px 12px; }
+      .brand { flex: 0 0 auto; padding: 0 8px 0 0; font-size: 13px; }
+      .brand-mark { width: 30px; height: 30px; }
+      .sidebar .nav-label, .sidebar-footer { display: none; }
+      .sidebar .nav-item, .sidebar .nav-item:not(.active) { display: inline-flex; flex: 0 0 auto; width: auto; margin: 0; padding: 8px; white-space: nowrap; }
       .main { margin-left: 0; }
       .topbar { height: 52px; padding: 0 16px; }
       .content { padding: 22px 14px 35px; }
@@ -177,6 +202,10 @@
       .dialog-header, .form-content { padding-right: 16px; padding-left: 16px; }
       .dialog-footer { padding-right: 16px; padding-left: 16px; }
       .photo-grid { grid-template-columns: repeat(4, minmax(0,1fr)); }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .setting-grid { grid-template-columns: 1fr; }
+      .settings-menu { display: flex; overflow-x: auto; }
+      .settings-tab { width: auto; white-space: nowrap; }
     }
   </style>
 </head>
@@ -185,15 +214,15 @@
     <aside class="sidebar" aria-label="Điều hướng quản trị">
       <div class="brand"><span class="brand-mark">✦</span> Collector Market</div>
       <div class="nav-label">Tổng quan</div>
-      <a class="nav-item" href="#dashboard"><span class="nav-icon">▦</span> Dashboard</a>
+      <a class="nav-item" href="#dashboard" data-page="dashboard"><span class="nav-icon">▦</span> Dashboard</a>
       <div class="nav-label">Cửa hàng</div>
-      <a class="nav-item active" href="#products" aria-current="page"><span class="nav-icon">◈</span> Sản phẩm</a>
-      <a class="nav-item" href="#categories"><span class="nav-icon">▤</span> Danh mục</a>
-      <a class="nav-item" href="#orders"><span class="nav-icon">▣</span> Đơn hàng</a>
-      <a class="nav-item" href="#customers"><span class="nav-icon">♙</span> Khách hàng</a>
+      <a class="nav-item active" href="#products" data-page="products" aria-current="page"><span class="nav-icon">◈</span> Sản phẩm</a>
+      <a class="nav-item" href="#categories" data-page="categories"><span class="nav-icon">▤</span> Danh mục</a>
+      <a class="nav-item" href="#orders" data-page="orders"><span class="nav-icon">▣</span> Đơn hàng</a>
+      <a class="nav-item" href="#customers" data-page="customers"><span class="nav-icon">♙</span> Khách hàng</a>
       <div class="nav-label">Nội dung</div>
-      <a class="nav-item" href="#reviews"><span class="nav-icon">☆</span> Đánh giá</a>
-      <a class="nav-item" href="#settings"><span class="nav-icon">⚙</span> Cài đặt</a>
+      <a class="nav-item" href="#reviews" data-page="reviews"><span class="nav-icon">☆</span> Đánh giá</a>
+      <a class="nav-item" href="#settings" data-page="settings"><span class="nav-icon">⚙</span> Cài đặt</a>
       <div class="sidebar-footer">
         <div class="profile"><span class="avatar">TN</span><span><strong>Thành Nam</strong><small>Quản trị viên</small></span></div>
       </div>
@@ -201,10 +230,10 @@
 
     <main class="main">
       <header class="topbar">
-        <div class="crumb">Quản trị <span> / </span> <b>Sản phẩm</b></div>
+        <div class="crumb">Quản trị <span> / </span> <b id="breadcrumb">Sản phẩm</b></div>
         <div class="top-actions"><span class="help">Trung tâm trợ giúp</span><span aria-label="Thông báo">♧</span></div>
       </header>
-      <section class="content" id="products">
+      <section class="content app-page" id="page-products" data-page="products">
         <div class="page-heading">
           <div><h1>Sản phẩm</h1><p class="subtitle">Quản lý thông tin, hình ảnh, tồn kho và hiệu quả bán hàng.</p></div>
           <button class="button button-primary" id="addProduct"><span>＋</span> Thêm sản phẩm</button>
@@ -240,6 +269,68 @@
           </div>
           <footer class="table-footer"><span id="tableSummary"></span><div class="pagination"><button class="page-button current" aria-label="Trang 1">1</button><button class="page-button" aria-label="Trang tiếp theo">›</button></div></footer>
         </section>
+      </section>
+
+      <section class="content app-page" id="page-dashboard" data-page="dashboard" hidden>
+        <div class="page-heading"><div><h1>Dashboard</h1><p class="subtitle">Tổng quan hoạt động cửa hàng trong tháng này.</p></div><span class="tag">Tháng 11/2026</span></div>
+        <div class="stats">
+          <div class="stat-card"><div><span class="stat-label">Doanh thu tháng</span><strong class="stat-value">48,6 triệu ₫</strong><span class="subtext">↑ 12,8% so với tháng trước</span></div><span class="stat-icon">₫</span></div>
+          <div class="stat-card"><div><span class="stat-label">Đơn hàng mới</span><strong class="stat-value" id="dashboardOrders">0</strong><span class="subtext">Đơn cần xử lý</span></div><span class="stat-icon">▣</span></div>
+          <div class="stat-card"><div><span class="stat-label">Sản phẩm đang bán</span><strong class="stat-value" id="dashboardProducts">0</strong><span class="subtext">Tính theo danh mục hiện có</span></div><span class="stat-icon">◈</span></div>
+          <div class="stat-card"><div><span class="stat-label">Khách hàng</span><strong class="stat-value" id="dashboardCustomers">0</strong><span class="subtext">Tài khoản đang hoạt động</span></div><span class="stat-icon">♙</span></div>
+        </div>
+        <div class="dashboard-grid">
+          <section class="panel chart-panel"><h2 class="chart-title">Doanh thu theo ngày</h2><p class="chart-subtitle">7 ngày gần nhất · dữ liệu demo</p><div class="chart-bars" aria-label="Biểu đồ doanh thu 7 ngày"><div class="chart-column"><span>2,4tr</span><div class="chart-bar" style="height:34%"></div><span>07/11</span></div><div class="chart-column"><span>3,1tr</span><div class="chart-bar" style="height:45%"></div><span>08/11</span></div><div class="chart-column"><span>1,8tr</span><div class="chart-bar" style="height:25%"></div><span>09/11</span></div><div class="chart-column"><span>4,2tr</span><div class="chart-bar" style="height:62%"></div><span>10/11</span></div><div class="chart-column"><span>3,6tr</span><div class="chart-bar" style="height:52%"></div><span>11/11</span></div><div class="chart-column"><span>5,1tr</span><div class="chart-bar" style="height:76%"></div><span>12/11</span></div><div class="chart-column"><span>6,4tr</span><div class="chart-bar" style="height:94%"></div><span>13/11</span></div></div></section>
+          <section class="panel chart-panel"><h2 class="chart-title">Cần chú ý</h2><p class="chart-subtitle">Các việc cần xử lý trong cửa hàng</p><div id="dashboardNotices"></div></section>
+        </div>
+        <section class="panel chart-panel dashboard-list"><div class="page-heading" style="margin-bottom:10px"><div><h2 class="chart-title">Đơn hàng gần đây</h2><p class="chart-subtitle">Theo dõi đơn mới nhất</p></div><button class="button button-small" data-go="orders">Xem tất cả</button></div><div class="table-wrap"><table><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Ngày đặt</th><th>Tổng tiền</th><th>Trạng thái</th></tr></thead><tbody id="dashboardOrderRows"></tbody></table></div></section>
+      </section>
+
+      <section class="content app-page" id="page-categories" data-page="categories" hidden>
+        <div class="page-heading"><div><h1>Danh mục</h1><p class="subtitle">Tổ chức sản phẩm theo nhóm để khách hàng dễ tìm kiếm.</p></div><button class="button button-primary" id="addCategory">＋ Thêm danh mục</button></div>
+        <div class="notice">Danh mục đang có sản phẩm không thể xóa. Hãy chuyển sản phẩm sang danh mục khác trước khi xóa.</div>
+        <section class="panel"><div class="filters"><label class="search"><span>⌕</span><input id="categorySearch" class="control" type="search" placeholder="Tìm tên danh mục..." aria-label="Tìm danh mục"></label><span class="result-count" id="categoryCount"></span></div><div class="table-wrap"><table><thead><tr><th>Danh mục</th><th>Slug</th><th>Sản phẩm</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="categoryRows"></tbody></table></div><div class="empty" id="categoryEmpty" hidden>Chưa có danh mục phù hợp.</div></section>
+      </section>
+
+      <section class="content app-page" id="page-orders" data-page="orders" hidden>
+        <div class="page-heading"><div><h1>Đơn hàng</h1><p class="subtitle">Theo dõi, xử lý và cập nhật trạng thái đơn hàng.</p></div><button class="button" id="exportOrders">⇩ Xuất danh sách</button></div>
+        <section class="stats">
+          <div class="stat-card"><div><span class="stat-label">Tất cả đơn</span><strong class="stat-value" id="orderTotal">0</strong></div><span class="stat-icon">▣</span></div>
+          <div class="stat-card"><div><span class="stat-label">Chờ xác nhận</span><strong class="stat-value" id="orderPending">0</strong></div><span class="stat-icon">!</span></div>
+          <div class="stat-card"><div><span class="stat-label">Đang giao</span><strong class="stat-value" id="orderShipping">0</strong></div><span class="stat-icon">➜</span></div>
+          <div class="stat-card"><div><span class="stat-label">Hoàn thành</span><strong class="stat-value" id="orderCompleted">0</strong></div><span class="stat-icon">✓</span></div>
+        </section>
+        <section class="panel"><div class="filters"><label class="search"><span>⌕</span><input id="orderSearch" class="control" type="search" placeholder="Tìm mã đơn hoặc khách hàng..." aria-label="Tìm đơn hàng"></label><select class="control" id="orderStatusFilter" aria-label="Lọc trạng thái đơn"><option value="">Tất cả trạng thái</option><option value="pending">Chờ xác nhận</option><option value="confirmed">Đã xác nhận</option><option value="shipping">Đang giao</option><option value="completed">Hoàn thành</option><option value="cancelled">Đã hủy</option></select><span class="result-count" id="orderCount"></span></div><div class="table-wrap"><table><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Ngày đặt</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="orderRows"></tbody></table></div><div class="empty" id="orderEmpty" hidden>Không tìm thấy đơn hàng.</div></section>
+      </section>
+
+      <section class="content app-page" id="page-customers" data-page="customers" hidden>
+        <div class="page-heading"><div><h1>Khách hàng</h1><p class="subtitle">Quản lý tài khoản và xem lịch sử mua hàng.</p></div><button class="button" id="exportCustomers">⇩ Xuất danh sách</button></div>
+        <section class="stats">
+          <div class="stat-card"><div><span class="stat-label">Tổng khách hàng</span><strong class="stat-value" id="customerTotal">0</strong></div><span class="stat-icon">♙</span></div>
+          <div class="stat-card"><div><span class="stat-label">Đang hoạt động</span><strong class="stat-value" id="customerActive">0</strong></div><span class="stat-icon">✓</span></div>
+          <div class="stat-card"><div><span class="stat-label">Đơn đã đặt</span><strong class="stat-value" id="customerOrderTotal">0</strong></div><span class="stat-icon">▣</span></div>
+          <div class="stat-card"><div><span class="stat-label">Khách mới tháng này</span><strong class="stat-value">8</strong></div><span class="stat-icon">＋</span></div>
+        </section>
+        <section class="panel"><div class="filters"><label class="search"><span>⌕</span><input id="customerSearch" class="control" type="search" placeholder="Tìm tên, email hoặc số điện thoại..." aria-label="Tìm khách hàng"></label><select class="control" id="customerStatusFilter" aria-label="Lọc tài khoản"><option value="">Tất cả tài khoản</option><option value="active">Đang hoạt động</option><option value="locked">Đã khóa</option></select><span class="result-count" id="customerCount"></span></div><div class="table-wrap"><table><thead><tr><th>Khách hàng</th><th>Điện thoại</th><th>Ngày tham gia</th><th>Số đơn</th><th>Tổng chi tiêu</th><th>Tài khoản</th><th>Thao tác</th></tr></thead><tbody id="customerRows"></tbody></table></div><div class="empty" id="customerEmpty" hidden>Không tìm thấy khách hàng.</div></section>
+      </section>
+
+      <section class="content app-page" id="page-reviews" data-page="reviews" hidden>
+        <div class="page-heading"><div><h1>Đánh giá</h1><p class="subtitle">Kiểm duyệt phản hồi của khách hàng về sản phẩm.</p></div></div>
+        <section class="stats">
+          <div class="stat-card"><div><span class="stat-label">Tổng đánh giá</span><strong class="stat-value" id="reviewTotal">0</strong></div><span class="stat-icon">☆</span></div>
+          <div class="stat-card"><div><span class="stat-label">Chờ duyệt</span><strong class="stat-value" id="reviewPending">0</strong></div><span class="stat-icon">!</span></div>
+          <div class="stat-card"><div><span class="stat-label">Đã công khai</span><strong class="stat-value" id="reviewPublished">0</strong></div><span class="stat-icon">✓</span></div>
+          <div class="stat-card"><div><span class="stat-label">Điểm trung bình</span><strong class="stat-value" id="reviewGlobalAverage">—</strong></div><span class="stat-icon">★</span></div>
+        </section>
+        <section class="panel"><div class="filters"><label class="search"><span>⌕</span><input id="reviewSearch" class="control" type="search" placeholder="Tìm nội dung, khách hàng, sản phẩm..." aria-label="Tìm đánh giá"></label><select class="control" id="reviewStatusFilter" aria-label="Lọc đánh giá"><option value="">Tất cả đánh giá</option><option value="pending">Chờ duyệt</option><option value="published">Đã công khai</option><option value="rejected">Đã từ chối</option></select><span class="result-count" id="reviewCount"></span></div><div class="table-wrap"><table><thead><tr><th>Khách hàng</th><th>Sản phẩm</th><th>Đánh giá</th><th>Ngày gửi</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="reviewRows"></tbody></table></div><div class="empty" id="reviewEmpty" hidden>Không có đánh giá phù hợp.</div></section>
+      </section>
+
+      <section class="content app-page" id="page-settings" data-page="settings" hidden>
+        <div class="page-heading"><div><h1>Cài đặt</h1><p class="subtitle">Thông tin cửa hàng và hồ sơ quản trị.</p></div></div>
+        <div class="setting-grid">
+          <nav class="panel settings-menu" aria-label="Nhóm cài đặt"><button class="settings-tab active" data-settings="store">Thông tin cửa hàng</button><button class="settings-tab" data-settings="admin">Hồ sơ quản trị</button><button class="settings-tab" data-settings="catalog">Vận hành cửa hàng</button></nav>
+          <section class="panel settings-content" id="settingsContent"></section>
+        </div>
       </section>
     </main>
   </div>
@@ -296,6 +387,21 @@
     </section>
   </div>
 
+  <div class="overlay" id="categoryOverlay" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="categoryDialogTitle" style="max-width:560px">
+      <header class="dialog-header"><div><h2 id="categoryDialogTitle">Thêm danh mục</h2><p>Tạo nhóm để phân loại sản phẩm.</p></div><button type="button" class="close-button" data-close="categoryOverlay" aria-label="Đóng">×</button></header>
+      <form id="categoryForm"><div class="form-content"><div class="field" style="margin-bottom:15px"><label for="categoryName">Tên danh mục <span>*</span></label><input id="categoryName" class="control" required maxlength="150" placeholder="Ví dụ: Mô hình robot"></div><div class="field" style="margin-bottom:15px"><label for="categoryParent">Danh mục cha</label><select id="categoryParent" class="control"><option value="">Không có</option></select></div><div class="field" style="margin-bottom:15px"><label for="categoryDescription">Mô tả</label><textarea id="categoryDescription" class="control" maxlength="1000" placeholder="Giới thiệu ngắn về danh mục"></textarea></div><div class="field"><label for="categoryState">Trạng thái</label><select id="categoryState" class="control"><option value="active">Đang hiển thị</option><option value="hidden">Đang ẩn</option></select></div></div><footer class="dialog-footer"><button type="button" class="button" data-close="categoryOverlay">Hủy</button><button type="submit" class="button button-primary">Lưu danh mục</button></footer></form>
+    </section>
+  </div>
+
+  <div class="overlay" id="detailOverlay" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle" style="max-width:620px">
+      <header class="dialog-header"><div><h2 id="detailTitle">Chi tiết</h2><p id="detailSubtitle"></p></div><button type="button" class="close-button" data-close="detailOverlay" aria-label="Đóng">×</button></header>
+      <div class="form-content" id="detailContent"></div>
+      <footer class="dialog-footer"><button type="button" class="button" data-close="detailOverlay">Đóng</button></footer>
+    </section>
+  </div>
+
   <div class="toast" id="toast" role="status" hidden></div>
   <script>
     const makeDemoImage = (color, label) => {
@@ -311,6 +417,49 @@
       { id: 5, name: "Hộp bảo quản thẻ chống ẩm", sku: "PK-CASE-008", category: "Phụ kiện", price: 99000, stock: 8, lifecycle: "hidden", description: "Hộp bảo quản thẻ bài, sức chứa 100 thẻ.", photos: [{ url: makeDemoImage("#e9d8fa", "CASE"), name: "case-demo.svg" }], sold: 31, reviews: [{ name: "Bảo Trân", date: "05/11/2026", stars: 4, text: "Nhỏ gọn và tiện mang theo." }] }
     ];
 
+    let categories = [
+      { id: 1, name: "Mô hình", slug: "mo-hinh", parentId: null, description: "Mô hình lắp ráp và sưu tầm.", status: "active" },
+      { id: 2, name: "Thẻ bài", slug: "the-bai", parentId: null, description: "Thẻ bài sưu tầm.", status: "active" },
+      { id: 3, name: "Phụ kiện", slug: "phu-kien", parentId: null, description: "Phụ kiện cho mô hình và thẻ bài.", status: "active" }
+    ];
+    let orders = [
+      { id: "DH-2026-0138", customer: "Minh Anh", email: "minhanh@example.com", date: "13/11/2026", items: ["Mô hình robot lắp ráp RX × 1"], total: 1250000, status: "pending", payment: "COD", address: "12 Nguyễn Huệ, Cao Lãnh, Đồng Tháp" },
+      { id: "DH-2026-0137", customer: "Thu Hà", email: "thuha@example.com", date: "13/11/2026", items: ["Bộ thẻ bài sưu tầm phiên bản 01 × 2"], total: 640000, status: "confirmed", payment: "Chuyển khoản", address: "55 Lê Lợi, Sa Đéc, Đồng Tháp" },
+      { id: "DH-2026-0136", customer: "Quốc Bảo", email: "quocbao@example.com", date: "12/11/2026", items: ["Kệ trưng bày mica 3 tầng × 1"], total: 185000, status: "shipping", payment: "COD", address: "8 Trần Phú, Cao Lãnh, Đồng Tháp" },
+      { id: "DH-2026-0135", customer: "Gia Hân", email: "giahan@example.com", date: "11/11/2026", items: ["Mô hình robot lắp ráp RX × 1", "Hộp bảo quản thẻ chống ẩm × 2"], total: 1448000, status: "completed", payment: "Chuyển khoản", address: "21 Phạm Hữu Lầu, Cao Lãnh, Đồng Tháp" },
+      { id: "DH-2026-0134", customer: "Đức Anh", email: "ducanh@example.com", date: "10/11/2026", items: ["Bộ thẻ bài sưu tầm phiên bản 01 × 1"], total: 320000, status: "cancelled", payment: "COD", address: "4 Nguyễn Trãi, Hồng Ngự, Đồng Tháp" }
+    ];
+    let customers = [
+      { id: 1, name: "Minh Anh", email: "minhanh@example.com", phone: "0912 345 678", joined: "02/09/2026", orders: 8, spent: 4620000, status: "active" },
+      { id: 2, name: "Thu Hà", email: "thuha@example.com", phone: "0987 654 321", joined: "14/09/2026", orders: 5, spent: 2190000, status: "active" },
+      { id: 3, name: "Quốc Bảo", email: "quocbao@example.com", phone: "0901 222 333", joined: "20/09/2026", orders: 4, spent: 1875000, status: "active" },
+      { id: 4, name: "Đức Anh", email: "ducanh@example.com", phone: "0933 456 789", joined: "03/10/2026", orders: 2, spent: 640000, status: "locked" }
+    ];
+    let reviewQueue = products.flatMap(product => product.reviews.map((review, index) => ({
+      id: `${product.id}-${index}`,
+      productId: product.id,
+      productName: product.name,
+      customer: review.name,
+      date: review.date,
+      stars: review.stars,
+      text: review.text,
+      status: "published"
+    })));
+    reviewQueue.push(
+      { id: "pending-1", productId: 1, productName: products[0].name, customer: "Hoàng Long", date: "13/11/2026", stars: 5, text: "Sản phẩm rất đẹp, shop tư vấn nhiệt tình.", status: "pending" },
+      { id: "pending-2", productId: 2, productName: products[1].name, customer: "Ngọc Linh", date: "12/11/2026", stars: 3, text: "Đóng gói ổn, mong có thêm nhiều mẫu mới.", status: "pending" }
+    );
+    let editingCategoryId = null;
+    const settingsValues = {
+      storeName: "Collector Market",
+      storeEmail: "support@collectormarket.vn",
+      storePhone: "0277 123 456",
+      storeAddress: "Cao Lãnh, Đồng Tháp",
+      adminName: "Thành Nam",
+      adminEmail: "admin@example.com",
+      lowStockThreshold: "5"
+    };
+    let activeSettingsTab = "store";
     let editingId = null;
     let selectedPhotos = [];
     let toastTimer;
@@ -383,6 +532,7 @@
       editingId = product ? product.id : null;
       selectedPhotos = product ? product.photos.map(photo => ({ ...photo })) : [];
       form.reset();
+      renderCategoryOptions();
       document.getElementById("productDialogTitle").textContent = product ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm";
       document.getElementById("productName").value = product ? product.name : "";
       document.getElementById("productSku").value = product ? product.sku : "";
@@ -536,7 +686,312 @@
       document.getElementById("reviewsOverlay").hidden = false;
     }
 
+    const orderStatusLabels = { pending: "Chờ xác nhận", confirmed: "Đã xác nhận", shipping: "Đang giao", completed: "Hoàn thành", cancelled: "Đã hủy" };
+    const reviewStatusLabels = { pending: "Chờ duyệt", published: "Đã công khai", rejected: "Đã từ chối" };
+
+    function slugify(value) {
+      return value.toLocaleLowerCase("vi").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    function renderCategoryOptions() {
+      const filter = document.getElementById("categoryFilter");
+      const selectedFilter = filter.value;
+      filter.innerHTML = `<option value="">Tất cả danh mục</option>${categories.filter(category => category.status === "active").map(category => `<option value="${escapeHTML(category.name)}">${escapeHTML(category.name)}</option>`).join("")}`;
+      filter.value = selectedFilter;
+      const productSelect = document.getElementById("productCategory");
+      const selectedProductCategory = productSelect.value;
+      const currentProduct = products.find(product => product.id === editingId);
+      productSelect.innerHTML = `<option value="">Chọn danh mục</option>${categories.filter(category => category.status === "active" || (currentProduct && category.name === currentProduct.category)).map(category => `<option value="${escapeHTML(category.name)}">${escapeHTML(category.name)}${category.status === "hidden" ? " (đang ẩn)" : ""}</option>`).join("")}`;
+      productSelect.value = selectedProductCategory;
+    }
+
+    function renderCategories() {
+      renderCategoryOptions();
+      const query = document.getElementById("categorySearch").value.trim().toLocaleLowerCase("vi");
+      const visible = categories.filter(category => `${category.name} ${category.slug}`.toLocaleLowerCase("vi").includes(query));
+      document.getElementById("categoryRows").innerHTML = visible.map(category => {
+        const productCount = products.filter(product => !product.deleted && product.category === category.name).length;
+        const parent = categories.find(item => item.id === category.parentId);
+        return `<tr><td><div class="product-cell" style="min-width:190px"><span class="category-icon">▤</span><div><b>${escapeHTML(category.name)}</b><div class="subtext">${parent ? `↳ ${escapeHTML(parent.name)}` : "Danh mục gốc"}</div></div></div></td><td><span class="tag">${escapeHTML(category.slug)}</span></td><td>${productCount} sản phẩm</td><td><span class="pill ${category.status === "active" ? "pill-green" : "pill-gray"}">${category.status === "active" ? "Đang hiển thị" : "Đang ẩn"}</span></td><td><div class="actions"><button class="icon-button" data-category-action="edit" data-id="${category.id}" aria-label="Sửa ${escapeHTML(category.name)}" title="Sửa">✎</button><button class="icon-button delete" data-category-action="delete" data-id="${category.id}" aria-label="Xóa ${escapeHTML(category.name)}" title="Xóa danh mục">⌫</button></div></td></tr>`;
+      }).join("");
+      document.getElementById("categoryEmpty").hidden = visible.length > 0;
+      document.getElementById("categoryCount").textContent = `${visible.length} danh mục`;
+      const parentSelect = document.getElementById("categoryParent");
+      const currentCategory = categories.find(category => category.id === editingCategoryId);
+      const descendants = new Set();
+      function collectDescendants(parentId) {
+        categories.filter(category => category.parentId === parentId && !descendants.has(category.id)).forEach(category => {
+          descendants.add(category.id);
+          collectDescendants(category.id);
+        });
+      }
+      if (currentCategory) collectDescendants(currentCategory.id);
+      parentSelect.innerHTML = `<option value="">Không có</option>${categories.filter(category => category.id !== editingCategoryId && !descendants.has(category.id)).map(category => `<option value="${category.id}">${escapeHTML(category.name)}</option>`).join("")}`;
+      if (currentCategory) parentSelect.value = currentCategory.parentId || "";
+    }
+
+    function openCategory(category) {
+      editingCategoryId = category ? category.id : null;
+      document.getElementById("categoryDialogTitle").textContent = category ? "Chỉnh sửa danh mục" : "Thêm danh mục";
+      document.getElementById("categoryName").value = category ? category.name : "";
+      document.getElementById("categoryDescription").value = category ? category.description : "";
+      document.getElementById("categoryState").value = category ? category.status : "active";
+      renderCategories();
+      document.getElementById("categoryParent").value = category ? category.parentId || "" : "";
+      document.getElementById("categoryOverlay").hidden = false;
+      document.getElementById("categoryName").focus();
+    }
+
+    function renderOrders() {
+      const query = document.getElementById("orderSearch").value.trim().toLocaleLowerCase("vi");
+      const status = document.getElementById("orderStatusFilter").value;
+      const visible = orders.filter(order => (!status || order.status === status) && `${order.id} ${order.customer}`.toLocaleLowerCase("vi").includes(query));
+      document.getElementById("orderRows").innerHTML = visible.map(order => `<tr><td><b>${escapeHTML(order.id)}</b></td><td>${escapeHTML(order.customer)}<div class="subtext">${escapeHTML(order.email)}</div></td><td>${escapeHTML(order.date)}</td><td>${order.items.length} sản phẩm</td><td class="price">${formatMoney(order.total)}</td><td><select class="inline-select status-select" data-order-status="${escapeHTML(order.id)}" aria-label="Trạng thái ${escapeHTML(order.id)}">${Object.entries(orderStatusLabels).map(([key, label]) => `<option value="${key}" ${order.status === key ? "selected" : ""}>${label}</option>`).join("")}</select></td><td><button class="button button-small" data-order-detail="${escapeHTML(order.id)}">Chi tiết</button></td></tr>`).join("");
+      document.getElementById("orderEmpty").hidden = visible.length > 0;
+      document.getElementById("orderCount").textContent = `${visible.length} đơn hàng`;
+      document.getElementById("orderTotal").textContent = orders.length;
+      document.getElementById("orderPending").textContent = orders.filter(order => order.status === "pending").length;
+      document.getElementById("orderShipping").textContent = orders.filter(order => order.status === "shipping").length;
+      document.getElementById("orderCompleted").textContent = orders.filter(order => order.status === "completed").length;
+    }
+
+    function renderCustomers() {
+      const query = document.getElementById("customerSearch").value.trim().toLocaleLowerCase("vi");
+      const status = document.getElementById("customerStatusFilter").value;
+      const visible = customers.filter(customer => (!status || customer.status === status) && `${customer.name} ${customer.email} ${customer.phone}`.toLocaleLowerCase("vi").includes(query));
+      document.getElementById("customerRows").innerHTML = visible.map(customer => `<tr><td><div class="product-cell" style="min-width:205px"><span class="avatar">${escapeHTML(customer.name.split(" ").map(part => part[0]).slice(-2).join("").toUpperCase())}</span><div><b>${escapeHTML(customer.name)}</b><div class="subtext">${escapeHTML(customer.email)}</div></div></div></td><td>${escapeHTML(customer.phone)}</td><td>${escapeHTML(customer.joined)}</td><td>${customer.orders}</td><td class="price">${formatMoney(customer.spent)}</td><td><span class="pill ${customer.status === "active" ? "pill-green" : "pill-red"}">${customer.status === "active" ? "Hoạt động" : "Đã khóa"}</span></td><td><div class="actions"><button class="button button-small" data-customer-detail="${customer.id}">Lịch sử</button><button class="button button-small ${customer.status === "locked" ? "" : "button-danger"}" data-customer-toggle="${customer.id}">${customer.status === "locked" ? "Mở khóa" : "Khóa"}</button></div></td></tr>`).join("");
+      document.getElementById("customerEmpty").hidden = visible.length > 0;
+      document.getElementById("customerCount").textContent = `${visible.length} khách hàng`;
+      document.getElementById("customerTotal").textContent = customers.length;
+      document.getElementById("customerActive").textContent = customers.filter(customer => customer.status === "active").length;
+      document.getElementById("customerOrderTotal").textContent = customers.reduce((sum, customer) => sum + customer.orders, 0);
+    }
+
+    function renderReviews() {
+      const query = document.getElementById("reviewSearch").value.trim().toLocaleLowerCase("vi");
+      const status = document.getElementById("reviewStatusFilter").value;
+      const visible = reviewQueue.filter(review => (!status || review.status === status) && `${review.customer} ${review.productName} ${review.text}`.toLocaleLowerCase("vi").includes(query));
+      document.getElementById("reviewRows").innerHTML = visible.map(review => `<tr><td><b>${escapeHTML(review.customer)}</b></td><td><div class="product-name">${escapeHTML(review.productName)}</div></td><td><div class="rating">${"★".repeat(review.stars)}${"☆".repeat(5-review.stars)}</div><div class="review-admin-copy">${escapeHTML(review.text)}</div></td><td>${escapeHTML(review.date)}</td><td><span class="pill ${review.status === "published" ? "pill-green" : review.status === "pending" ? "pill-gray" : "pill-red"}">${reviewStatusLabels[review.status]}</span></td><td><div class="actions">${review.status === "pending" ? `<button class="button button-small button-primary" data-review-action="publish" data-id="${escapeHTML(review.id)}">Duyệt</button><button class="button button-small button-danger" data-review-action="reject" data-id="${escapeHTML(review.id)}">Từ chối</button>` : `<button class="button button-small" data-review-action="${review.status === "published" ? "reject" : "publish"}" data-id="${escapeHTML(review.id)}">${review.status === "published" ? "Ẩn" : "Duyệt lại"}</button>`}</div></td></tr>`).join("");
+      document.getElementById("reviewEmpty").hidden = visible.length > 0;
+      document.getElementById("reviewCount").textContent = `${visible.length} đánh giá`;
+      document.getElementById("reviewTotal").textContent = reviewQueue.length;
+      document.getElementById("reviewPending").textContent = reviewQueue.filter(review => review.status === "pending").length;
+      document.getElementById("reviewPublished").textContent = reviewQueue.filter(review => review.status === "published").length;
+      const published = reviewQueue.filter(review => review.status === "published");
+      const average = published.length ? published.reduce((sum, review) => sum + review.stars, 0) / published.length : 0;
+      document.getElementById("reviewGlobalAverage").textContent = average ? average.toFixed(1) : "—";
+    }
+
+    function renderDashboard() {
+      const activeProducts = products.filter(product => !product.deleted && product.lifecycle === "active");
+      document.getElementById("dashboardOrders").textContent = orders.filter(order => order.status === "pending").length;
+      document.getElementById("dashboardProducts").textContent = activeProducts.length;
+      document.getElementById("dashboardCustomers").textContent = customers.filter(customer => customer.status === "active").length;
+      const lowStock = activeProducts.filter(product => product.stock > 0 && product.stock <= 5).length;
+      const outOfStock = activeProducts.filter(product => product.stock === 0).length;
+      const notices = [
+        `<div class="notice">📦 ${outOfStock} sản phẩm đang hết hàng. <button class="button button-small" data-go="products">Kiểm tra kho</button></div>`,
+        `<div class="notice">⚠ ${lowStock} sản phẩm sắp hết hàng.</div>`,
+        `<div class="notice">🧾 ${orders.filter(order => order.status === "pending").length} đơn đang chờ xác nhận. <button class="button button-small" data-go="orders">Xử lý đơn</button></div>`
+      ];
+      document.getElementById("dashboardNotices").innerHTML = notices.join("");
+      document.getElementById("dashboardOrderRows").innerHTML = orders.slice(0, 4).map(order => `<tr><td><b>${escapeHTML(order.id)}</b></td><td>${escapeHTML(order.customer)}</td><td>${escapeHTML(order.date)}</td><td class="price">${formatMoney(order.total)}</td><td><span class="pill ${order.status === "completed" ? "pill-green" : order.status === "cancelled" ? "pill-red" : "pill-gray"}">${orderStatusLabels[order.status]}</span></td></tr>`).join("");
+    }
+
+    function renderSettings() {
+      const sections = {
+        store: `<h2>Thông tin cửa hàng</h2><p>Cập nhật thông tin hiển thị trên trang bán hàng.</p><form id="settingsForm"><div class="field"><label for="storeName">Tên cửa hàng</label><input id="storeName" class="control" value="${escapeHTML(settingsValues.storeName)}" required></div><div class="field"><label for="storeEmail">Email liên hệ</label><input id="storeEmail" class="control" type="email" value="${escapeHTML(settingsValues.storeEmail)}" required></div><div class="field"><label for="storePhone">Số điện thoại</label><input id="storePhone" class="control" value="${escapeHTML(settingsValues.storePhone)}"></div><div class="field"><label for="storeAddress">Địa chỉ</label><input id="storeAddress" class="control" value="${escapeHTML(settingsValues.storeAddress)}"></div><button class="button button-primary" type="submit">Lưu thay đổi</button></form>`,
+        admin: `<h2>Hồ sơ quản trị</h2><p>Thông tin người đang sử dụng khu vực quản trị.</p><form id="settingsForm"><div class="field"><label for="adminName">Họ tên</label><input id="adminName" class="control" value="${escapeHTML(settingsValues.adminName)}" required></div><div class="field"><label for="adminEmail">Email quản trị</label><input id="adminEmail" class="control" type="email" value="${escapeHTML(settingsValues.adminEmail)}" required></div><div class="field"><label>Vai trò</label><input class="control" value="Quản trị viên" disabled></div><button class="button button-primary" type="submit">Lưu hồ sơ</button></form>`,
+        catalog: `<h2>Vận hành cửa hàng</h2><p>Các ngưỡng cảnh báo hiển thị trong dashboard.</p><form id="settingsForm"><div class="field"><label for="lowStockThreshold">Ngưỡng cảnh báo sắp hết hàng</label><input id="lowStockThreshold" class="control" type="number" min="1" value="${escapeHTML(settingsValues.lowStockThreshold)}" required></div><div class="field"><label for="reviewModeration">Kiểm duyệt đánh giá</label><select id="reviewModeration" class="control"><option>Đánh giá cần duyệt trước khi công khai</option><option>Đăng công khai tự động</option></select></div><div class="field"><label for="inventoryPolicy">Tình trạng hàng</label><input id="inventoryPolicy" class="control" value="Tự động tính theo tồn kho" disabled></div><button class="button button-primary" type="submit">Lưu cài đặt</button></form>`
+      };
+      document.getElementById("settingsContent").innerHTML = sections[activeSettingsTab];
+      document.querySelectorAll(".settings-tab").forEach(button => button.classList.toggle("active", button.dataset.settings === activeSettingsTab));
+    }
+
+    function showDetails(title, subtitle, content) {
+      document.getElementById("detailTitle").textContent = title;
+      document.getElementById("detailSubtitle").textContent = subtitle;
+      document.getElementById("detailContent").innerHTML = content;
+      document.getElementById("detailOverlay").hidden = false;
+    }
+
+    function openOrderDetails(order) {
+      showDetails(`Đơn hàng ${order.id}`, `${order.customer} · ${order.date}`, `<div class="notice"><b>Trạng thái:</b> ${orderStatusLabels[order.status]}<br><b>Thanh toán:</b> ${escapeHTML(order.payment)}</div><h3 style="font-size:13px">Sản phẩm</h3><ul>${order.items.map(item => `<li style="padding:6px 0">${escapeHTML(item)}</li>`).join("")}</ul><p><b>Địa chỉ giao hàng:</b><br>${escapeHTML(order.address)}</p><p><b>Tổng thanh toán:</b> ${formatMoney(order.total)}</p>`);
+    }
+
+    function exportCsv(filename, headers, rowsData) {
+      const csv = [headers, ...rowsData].map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+      const url = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast("Đã tải file CSV.");
+    }
+
+    function switchPage(page) {
+      const labels = { dashboard: "Dashboard", products: "Sản phẩm", categories: "Danh mục", orders: "Đơn hàng", customers: "Khách hàng", reviews: "Đánh giá", settings: "Cài đặt" };
+      const target = labels[page] ? page : "products";
+      document.querySelectorAll(".app-page").forEach(section => { section.hidden = section.dataset.page !== target; });
+      document.querySelectorAll(".nav-item[data-page]").forEach(link => {
+        const active = link.dataset.page === target;
+        link.classList.toggle("active", active);
+        if (active) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      });
+      document.getElementById("breadcrumb").textContent = labels[target];
+      document.title = `${labels[target]} | Collector Market`;
+      if (target === "dashboard") renderDashboard();
+      if (target === "categories") renderCategories();
+      if (target === "orders") renderOrders();
+      if (target === "customers") renderCustomers();
+      if (target === "reviews") renderReviews();
+      if (target === "settings") renderSettings();
+      if (target === "products") renderProducts();
+    }
+
+    document.querySelectorAll(".nav-item[data-page]").forEach(link => link.addEventListener("click", event => {
+      event.preventDefault();
+      const page = link.dataset.page;
+      history.replaceState(null, "", `#${page}`);
+      switchPage(page);
+    }));
+    document.querySelectorAll("[data-go]").forEach(button => button.addEventListener("click", () => {
+      const page = button.dataset.go;
+      history.replaceState(null, "", `#${page}`);
+      switchPage(page);
+    }));
+    document.getElementById("addCategory").addEventListener("click", () => openCategory(null));
+    document.getElementById("categorySearch").addEventListener("input", renderCategories);
+    document.getElementById("categoryForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const name = document.getElementById("categoryName").value.trim();
+      const duplicate = categories.some(category => category.name.toLocaleLowerCase("vi") === name.toLocaleLowerCase("vi") && category.id !== editingCategoryId);
+      if (duplicate) return showToast("Tên danh mục đã tồn tại.");
+      const duplicateSlug = categories.some(category => category.slug === slugify(name) && category.id !== editingCategoryId);
+      if (duplicateSlug) return showToast("Đường dẫn danh mục đã tồn tại.");
+      const parentId = Number(document.getElementById("categoryParent").value) || null;
+      const descendants = new Set();
+      function collectDescendants(parent) {
+        categories.filter(category => category.parentId === parent && !descendants.has(category.id)).forEach(category => {
+          descendants.add(category.id);
+          collectDescendants(category.id);
+        });
+      }
+      if (editingCategoryId) collectDescendants(editingCategoryId);
+      if (editingCategoryId && (parentId === editingCategoryId || descendants.has(parentId))) return showToast("Không thể tạo vòng lặp danh mục cha-con.");
+      const old = categories.find(category => category.id === editingCategoryId);
+      const category = { id: editingCategoryId || Math.max(0, ...categories.map(item => item.id)) + 1, name, slug: slugify(name), parentId, description: document.getElementById("categoryDescription").value.trim(), status: document.getElementById("categoryState").value };
+      if (old) {
+        products.forEach(product => { if (product.category === old.name) product.category = name; });
+        categories = categories.map(item => item.id === editingCategoryId ? category : item);
+      } else categories.push(category);
+      closeOverlay("categoryOverlay");
+      renderCategories();
+      renderProducts();
+      showToast(old ? "Đã cập nhật danh mục." : "Đã thêm danh mục.");
+    });
+    document.getElementById("categoryRows").addEventListener("click", event => {
+      const button = event.target.closest("[data-category-action]");
+      if (!button) return;
+      const category = categories.find(item => item.id === Number(button.dataset.id));
+      if (!category) return;
+      if (button.dataset.categoryAction === "edit") openCategory(category);
+      if (button.dataset.categoryAction === "delete") {
+        const inUse = products.some(product => !product.deleted && product.category === category.name);
+        const hasChildren = categories.some(item => item.parentId === category.id);
+        if (inUse || hasChildren) return showToast("Danh mục còn sản phẩm hoặc danh mục con, không thể xóa.");
+        if (confirm(`Xóa danh mục "${category.name}"?`)) {
+          categories = categories.filter(item => item.id !== category.id);
+          renderCategories();
+          showToast("Đã xóa danh mục.");
+        }
+      }
+    });
+
+    document.getElementById("orderSearch").addEventListener("input", renderOrders);
+    document.getElementById("orderStatusFilter").addEventListener("change", renderOrders);
+    document.getElementById("orderRows").addEventListener("change", event => {
+      const orderId = event.target.dataset.orderStatus;
+      if (!orderId) return;
+      const order = orders.find(item => item.id === orderId);
+      if (order) {
+        order.status = event.target.value;
+        renderOrders();
+        renderDashboard();
+        showToast(`Đã cập nhật trạng thái ${order.id}.`);
+      }
+    });
+    document.getElementById("orderRows").addEventListener("click", event => {
+      const button = event.target.closest("[data-order-detail]");
+      if (button) {
+        const order = orders.find(item => item.id === button.dataset.orderDetail);
+        if (order) openOrderDetails(order);
+      }
+    });
+    document.getElementById("exportOrders").addEventListener("click", () => exportCsv("don-hang.csv", ["Mã đơn", "Khách hàng", "Email", "Ngày đặt", "Tổng tiền", "Trạng thái"], orders.map(order => [order.id, order.customer, order.email, order.date, order.total, orderStatusLabels[order.status]])));
+
+    document.getElementById("customerSearch").addEventListener("input", renderCustomers);
+    document.getElementById("customerStatusFilter").addEventListener("change", renderCustomers);
+    document.getElementById("customerRows").addEventListener("click", event => {
+      const toggle = event.target.closest("[data-customer-toggle]");
+      if (toggle) {
+        const customer = customers.find(item => item.id === Number(toggle.dataset.customerToggle));
+        if (!customer) return;
+        customer.status = customer.status === "active" ? "locked" : "active";
+        renderCustomers();
+        showToast(customer.status === "locked" ? "Đã khóa tài khoản khách hàng." : "Đã mở khóa tài khoản.");
+        return;
+      }
+      const details = event.target.closest("[data-customer-detail]");
+      if (details) {
+        const customer = customers.find(item => item.id === Number(details.dataset.customerDetail));
+        if (!customer) return;
+        const history = orders.filter(order => order.customer === customer.name);
+        const list = history.length ? history.map(order => `<li style="padding:7px 0"><b>${escapeHTML(order.id)}</b> · ${escapeHTML(order.date)} · ${formatMoney(order.total)} · ${orderStatusLabels[order.status]}</li>`).join("") : "<li>Khách hàng chưa có đơn hàng.</li>";
+        showDetails(customer.name, customer.email, `<div class="notice"><b>Điện thoại:</b> ${escapeHTML(customer.phone)}<br><b>Ngày tham gia:</b> ${escapeHTML(customer.joined)}<br><b>Tài khoản:</b> ${customer.status === "active" ? "Đang hoạt động" : "Đã khóa"}<br><b>Tổng chi tiêu:</b> ${formatMoney(customer.spent)}</div><h3 style="font-size:13px">Lịch sử đơn hàng</h3><ul>${list}</ul>`);
+      }
+    });
+    document.getElementById("exportCustomers").addEventListener("click", () => exportCsv("khach-hang.csv", ["Họ tên", "Email", "Điện thoại", "Ngày tham gia", "Số đơn", "Tổng chi tiêu", "Trạng thái"], customers.map(customer => [customer.name, customer.email, customer.phone, customer.joined, customer.orders, customer.spent, customer.status])));
+
+    document.getElementById("reviewSearch").addEventListener("input", renderReviews);
+    document.getElementById("reviewStatusFilter").addEventListener("change", renderReviews);
+    document.getElementById("reviewRows").addEventListener("click", event => {
+      const button = event.target.closest("[data-review-action]");
+      if (!button) return;
+      const review = reviewQueue.find(item => item.id === button.dataset.id);
+      if (!review) return;
+      review.status = button.dataset.reviewAction === "publish" ? "published" : "rejected";
+      const product = products.find(item => item.id === review.productId);
+      if (product) {
+        product.reviews = product.reviews.filter(item => item.name !== review.customer);
+        if (review.status === "published") product.reviews.push({ name: review.customer, date: review.date, stars: review.stars, text: review.text });
+      }
+      renderReviews();
+      renderProducts();
+      showToast(review.status === "published" ? "Đã duyệt đánh giá." : "Đã ẩn/từ chối đánh giá.");
+    });
+
+    document.querySelectorAll(".settings-tab").forEach(button => button.addEventListener("click", () => {
+      activeSettingsTab = button.dataset.settings;
+      renderSettings();
+    }));
+    document.getElementById("settingsContent").addEventListener("submit", event => {
+      if (event.target.id !== "settingsForm") return;
+      event.preventDefault();
+      event.target.querySelectorAll("input:not(:disabled)").forEach(input => {
+        if (input.id in settingsValues) settingsValues[input.id] = input.value;
+      });
+      showToast("Đã lưu cài đặt demo.");
+    });
+
+    document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => closeOverlay(button.dataset.close)));
+    window.addEventListener("hashchange", () => switchPage(location.hash.slice(1)));
+
+    renderCategoryOptions();
     renderProducts();
+    switchPage(location.hash.slice(1) || "products");
   </script>
 </body>
 </html>

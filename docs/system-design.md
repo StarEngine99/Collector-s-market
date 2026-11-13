@@ -69,11 +69,15 @@ Khu vực `/admin` chỉ cho phép phiên đăng nhập có quyền phù hợp. 
 
 | Màn hình | Nội dung và thao tác |
 |---|---|
+| Dashboard (`/admin`) | Tổng quan doanh thu, đơn cần xử lý, sản phẩm sắp/hết hàng và các đơn gần đây |
 | Sản phẩm (`/admin/products`) | Tìm tên/SKU; lọc danh mục, tình trạng hàng/trạng thái hiển thị, giá; phân trang; cột ảnh đại diện, tên/SKU, danh mục, giá, tồn kho, số lượng đã bán, điểm đánh giá/lượt đánh giá; thao tác xem/sửa/ẩn theo quyền |
 | Tạo/sửa sản phẩm (`/admin/products/create`, `/admin/products/{id}/edit`) | Tên, SKU, slug, danh mục, mô tả, giá, số lượng tồn, trạng thái hiển thị và 0–5 ảnh; hiển thị lỗi sát trường nhập; xem số lượng đã bán/đánh giá dạng chỉ đọc |
+| Danh mục (`/admin/categories`) | Tìm, thêm/sửa/xóa danh mục; hiển thị slug, số sản phẩm và trạng thái; chặn xóa danh mục còn sản phẩm/con |
+| Đơn hàng (`/admin/orders`) | Tìm/lọc đơn, xem chi tiết giao hàng/thanh toán và cập nhật trạng thái theo luồng xử lý |
+| Khách hàng (`/admin/customers`) | Tìm tài khoản, xem lịch sử đơn và khóa/mở khóa |
 | Đánh giá sản phẩm | Điểm trung bình và các đánh giá đã duyệt; dữ liệu tổng hợp từ `product_reviews`, không nhập điểm thủ công ở form sản phẩm |
-| Danh mục (`/admin/categories`) | Danh sách dạng cây; tên, slug, danh mục cha, thứ tự, trạng thái và số sản phẩm; tìm kiếm, thêm/sửa/ẩn |
 | Tạo/sửa danh mục (`/admin/categories/create`, `/admin/categories/{id}/edit`) | Tên, slug, mô tả, danh mục cha, thứ tự hiển thị, trạng thái; không cho chọn chính nó hoặc hậu duệ làm danh mục cha |
+| Cài đặt (`/admin/settings`) | Cập nhật thông tin demo của cửa hàng/hồ sơ quản trị và ngưỡng cảnh báo tồn kho |
 
 Nút hành động bị ẩn khi thiếu quyền để giao diện rõ ràng, nhưng đây chỉ là UX; server vẫn trả `403` nếu request không được phép. Trạng thái rỗng, đang tải, lỗi tải danh sách và kết quả lọc rỗng cần có thông báo riêng.
 
