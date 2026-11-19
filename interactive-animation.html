@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmic Energy & 3D Tilt - Web Animation Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: #070913;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Canvas phủ toàn màn hình */
+    #canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    /* Lớp giao diện phía trên canvas */
+    .ui-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 20px;
+      pointer-events: none; /* Chỉ các thẻ con nhận tương tác */
+    }
+
+    .ui-interactive {
+      pointer-events: auto;
+    }
+
+    /* 3D Glassmorphism Card */
+    .card-wrapper {
+      perspective: 1000px;
+    }
+
+    .card {
+      width: 380px;
+      max-width: 90vw;
+      padding: 32px 28px;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6),
+                  0 0 40px rgba(56, 189, 248, 0.15);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    /* Hiệu ứng viền phát sáng Gradient chuyển động */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 26px;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--theme-color-1, #38bdf8), transparent 40%, var(--theme-color-2, #a855f7));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Vệt sáng lấp lánh (Specular sheen) di chuyển theo chuột */
+    .card-shine {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      background: radial-gradient(circle 200px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.22), transparent 80%);
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    }
+
+    .card:hover .card-shine {
+      opacity: 1;
+    }
+
+    .card-content {
+      transform: translateZ(35px);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--theme-color-1, #38bdf8);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.25;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* Các số liệu trực quan live */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* Thanh điều khiển dưới cùng */
+    .controls-panel {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-mode {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-mode:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-mode.active {
+      background: var(--theme-color-1, #38bdf8);
+      color: #040814;
+      box-shadow: 0 0 18px var(--theme-glow, rgba(56, 189, 248, 0.4));
+      border-color: transparent;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    }
+
+    .btn-action:hover {
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
+    }
+
+    .btn-action:active {
+      transform: scale(0.96);
+    }
+
+    /* Bảng chọn màu sắc (Themes) */
+    .theme-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 6px;
+      padding-left: 10px;
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .color-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid transparent;
+    }
+
+    .color-dot:hover, .color-dot.active {
+      transform: scale(1.25);
+      border-color: #fff;
+    }
+
+    /* Gợi ý tương tác */
+    .hint-text {
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+      margin-top: -8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Animated Canvas -->
+  <canvas id="canvas"></canvas>
+
+  <!-- Lớp Giao diện Tương tác -->
+  <div class="ui-container">
+    
+    <!-- 3D Card Glassmorphism -->
+    <div class="card-wrapper ui-interactive">
+      <div class="card" id="tiltCard">
+        <div class="card-shine" id="cardShine"></div>
+        <div class="card-content">
+          <div class="badge">
+            <span class="badge-dot"></span>
+            <span id="modeName">Cosmic Galaxy</span>
+          </div>
+
+          <h2 class="card-title">Interactive Particles & 3D Tilt</h2>
+          <p class="card-desc">
+            Hoạt ảnh không gian phản ứng linh hoạt với chuyển động chuột. Di chuột để nghiêng thẻ 3D, kéo hạt hoặc nhấp để kích nổ sóng xung kích.
+          </p>
+
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Hạt động</span>
+              <span class="stat-value" id="particleCount">120</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">FPS mượt</span>
+              <span class="stat-value" id="fpsDisplay">60</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Tương tác</span>
+              <span class="stat-value" id="interactStatus">Hover</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bảng Điều Khiển Tùy Chọn -->
+    <div class="controls-panel ui-interactive">
+      <!-- Chế độ hoạt ảnh -->
+      <button class="btn btn-mode active" data-mode="galaxy">✨ Galaxy</button>
+      <button class="btn btn-mode" data-mode="vortex">🌀 Vortex</button>
+      <button class="btn btn-mode" data-mode="wave">🌊 Cyber Wave</button>
+      
+      <!-- Nút Kích nổ hạt -->
+      <button class="btn btn-action" id="btnBurst">💥 Kích Nổ (Burst)</button>
+
+      <!-- Chọn Bảng Màu (Color Themes) -->
+      <div class="theme-picker">
+        <div class="color-dot active" data-theme="cyan" style="background: linear-gradient(135deg, #38bdf8, #818cf8);" title="Cyber Cyan"></div>
+        <div class="color-dot" data-theme="violet" style="background: linear-gradient(135deg, #ec4899, #a855f7);" title="Neon Purple"></div>
+        <div class="color-dot" data-theme="emerald" style="background: linear-gradient(135deg, #10b981, #06b6d4);" title="Aurora Green"></div>
+        <div class="color-dot" data-theme="amber" style="background: linear-gradient(135deg, #f59e0b, #ef4444);" title="Solar Gold"></div>
+      </div>
+    </div>
+
+    <div class="hint-text">
+      💡 Mẹo: Nhấp chuột ở bất kỳ đâu trên màn hình để tạo sóng xung kích & chùm hạt phát sáng!
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CẤU HÌNH BẢNG MÀU (THEMES)
+    // ==========================================
+    const THEMES = {
+      cyan: {
+        primary: '#38bdf8',
+        secondary: '#818cf8',
+        glow: 'rgba(56, 189, 248, 0.45)',
+        rgb1: [56, 189, 248],
+        rgb2: [129, 140, 248]
+      },
+      violet: {
+        primary: '#f43f5e',
+        secondary: '#a855f7',
+        glow: 'rgba(168, 85, 247, 0.45)',
+        rgb1: [244, 63, 94],
+        rgb2: [168, 85, 247]
+      },
+      emerald: {
+        primary: '#10b981',
+        secondary: '#06b6d4',
+        glow: 'rgba(16, 185, 129, 0.45)',
+        rgb1: [16, 185, 129],
+        rgb2: [6, 182, 212]
+      },
+      amber: {
+        primary: '#f59e0b',
+        secondary: '#ef4444',
+        glow: 'rgba(245, 158, 11, 0.45)',
+        rgb1: [245, 158, 11],
+        rgb2: [239, 68, 68]
+      }
+    };
+
+    let currentThemeKey = 'cyan';
+    let currentTheme = THEMES[currentThemeKey];
+    let currentMode = 'galaxy'; // 'galaxy', 'vortex', 'wave'
+
+    // Áp dụng biến CSS cho Theme
+    function applyTheme(themeKey) {
+      currentThemeKey = themeKey;
+      currentTheme = THEMES[themeKey];
+      document.documentElement.style.setProperty('--theme-color-1', currentTheme.primary);
+      document.documentElement.style.setProperty('--theme-color-2', currentTheme.secondary);
+      document.documentElement.style.setProperty('--theme-glow', currentTheme.glow);
+      
+      document.querySelectorAll('.color-dot').forEach(dot => {
+        dot.classList.toggle('active', dot.dataset.theme === themeKey);
+      });
+    }
+    applyTheme('cyan');
+
+    // ==========================================
+    // ÂM THANH TỔNG HỢP (WEB AUDIO API - NO ASSETS)
+    // ==========================================
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playBurstSound() {
+      try {
+        if (!audioCtx) audioCtx = new AudioContextClass();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(420, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.35);
+
+        gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+      } catch (e) {
+        // Trình duyệt không hỗ trợ hoặc chặn autoplay
+      }
+    }
+
+    // ==========================================
+    // HIỆU ỨNG THẺ 3D TILT & SPECULAR SHEEN
+    // ==========================================
+    const card = document.getElementById('tiltCard');
+    const cardShine = document.getElementById('cardShine');
+    const interactStatus = document.getElementById('interactStatus');
+
+    let cardBounds = card.getBoundingClientRect();
+    window.addEventListener('resize', () => {
+      cardBounds = card.getBoundingClientRect();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      cardBounds = card.getBoundingClientRect();
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      const isOverCard = (
+        mouseX >= cardBounds.left &&
+        mouseX <= cardBounds.right &&
+        mouseY >= cardBounds.top &&
+        mouseY <= cardBounds.bottom
+      );
+
+      if (isOverCard) {
+        interactStatus.textContent = 'Tilt 3D';
+        const xOffset = mouseX - (cardBounds.left + cardBounds.width / 2);
+        const yOffset = mouseY - (cardBounds.top + cardBounds.height / 2);
+
+        // Góc xoay trục X và Y
+        const rotateY = (xOffset / (cardBounds.width / 2)) * 14;
+        const rotateX = -(yOffset / (cardBounds.height / 2)) * 14;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+
+        // Vị trí ánh sáng lấp lánh (sheen)
+        const shineX = ((mouseX - cardBounds.left) / cardBounds.width) * 100;
+        const shineY = ((mouseY - cardBounds.top) / cardBounds.height) * 100;
+        card.style.setProperty('--mouse-x', `${shineX}%`);
+        card.style.setProperty('--mouse-y', `${shineY}%`);
+      } else {
+        interactStatus.textContent = 'Cosmic';
+        card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+      }
+    });
+
+    // ==========================================
+    // CANVAS ANIMATION ENGINE (60 FPS)
+    // ==========================================
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const particleCountEl = document.getElementById('particleCount');
+    const fpsDisplay = document.getElementById('fpsDisplay');
+
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+    });
+
+    const mouse = {
+      x: width / 2,
+      y: height / 2,
+      radius: 180,
+      active: false
+    };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.active = false;
+    });
+
+    // Cấu trúc Hạt (Particle)
+    class Particle {
+      constructor(isBurst = false, burstX = 0, burstY = 0) {
+        this.reset(isBurst, burstX, burstY);
+      }
+
+      reset(isBurst = false, burstX = 0, burstY = 0) {
+        this.isBurst = isBurst;
+        if (isBurst) {
+          this.x = burstX;
+          this.y = burstY;
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 8 + 3;
+          this.vx = Math.cos(angle) * speed;
+          this.vy = Math.sin(angle) * speed;
+          this.radius = Math.random() * 3.5 + 1.5;
+          this.life = 1.0;
+          this.decay = Math.random() * 0.02 + 0.015;
+        } else {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 1.2;
+          this.vy = (Math.random() - 0.5) * 1.2;
+          this.baseRadius = Math.random() * 2 + 1;
+          this.radius = this.baseRadius;
+          this.angle = Math.random() * Math.PI * 2;
+          this.orbitRadius = Math.random() * 250 + 50;
+          this.orbitSpeed = (Math.random() * 0.02 + 0.008) * (Math.random() > 0.5 ? 1 : -1);
+          this.originX = this.x;
+          this.originY = this.y;
+        }
+      }
+
+      update(time) {
+        if (this.isBurst) {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.vx *= 0.96;
+          this.vy *= 0.96;
+          this.life -= this.decay;
+          return this.life > 0;
+        }
+
+        if (currentMode === 'galaxy') {
+          // Trôi dạt tự nhiên
+          this.x += this.vx;
+          this.y += this.vy;
+
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+
+          // Hấp dẫn / Đẩy chuột
+          if (mouse.active) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < mouse.radius) {
+              const force = (1 - dist / mouse.radius) * 1.5;
+              this.x += (dx / dist) * force;
+              this.y += (dy / dist) * force;
+            }
+          }
+        } else if (currentMode === 'vortex') {
+          // Xoáy quanh tâm hoặc con trỏ chuột
+          const centerX = mouse.active ? mouse.x : width / 2;
+          const centerY = mouse.active ? mouse.y : height / 2;
+
+          this.angle += this.orbitSpeed;
+          this.orbitRadius -= 0.3; // Hút từ từ vào tâm
+          if (this.orbitRadius < 20) {
+            this.orbitRadius = Math.random() * 350 + 100;
+          }
+
+          this.x = centerX + Math.cos(this.angle) * this.orbitRadius;
+          this.y = centerY + Math.sin(this.angle) * this.orbitRadius;
+        } else if (currentMode === 'wave') {
+          // Làn sóng điều hòa lượng tử
+          const freq = 0.003;
+          const waveHeight = 60;
+          this.x += this.vx * 0.8;
+          if (this.x > width) this.x = 0;
+          if (this.x < 0) this.x = width;
+
+          this.y = this.originY + Math.sin(this.x * freq + time * 0.003) * waveHeight;
+
+          if (mouse.active) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < 120) {
+              const push = (1 - dist / 120) * 15;
+              this.y -= (dy / dist) * push;
+            }
+          }
+        }
+
+        return true;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+
+        if (this.isBurst) {
+          ctx.fillStyle = `rgba(${currentTheme.rgb1.join(',')}, ${this.life})`;
+          ctx.shadowColor = currentTheme.primary;
+          ctx.shadowBlur = 10;
+        } else {
+          ctx.fillStyle = `rgba(${currentTheme.rgb1.join(',')}, 0.85)`;
+          ctx.shadowColor = currentTheme.secondary;
+          ctx.shadowBlur = 6;
+        }
+        ctx.fill();
+        ctx.shadowBlur = 0; // Reset để tối ưu hiệu năng
+      }
+    }
+
+    // Hiệu ứng Sóng Xung Kích (Shockwave)
+    class Shockwave {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 10;
+        this.maxRadius = 240;
+        this.alpha = 1.0;
+        this.speed = 7;
+      }
+
+      update() {
+        this.radius += this.speed;
+        this.alpha = 1 - this.radius / this.maxRadius;
+        return this.alpha > 0;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = `rgba(${currentTheme.rgb1.join(',')}, ${this.alpha * 0.7})`;
+        ctx.shadowColor = currentTheme.primary;
+        ctx.shadowBlur = 14;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    let particles = [];
+    let shockwaves = [];
+    const BASE_PARTICLE_COUNT = 120;
+
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < BASE_PARTICLE_COUNT; i++) {
+        particles.push(new Particle());
+      }
+      particleCountEl.textContent = BASE_PARTICLE_COUNT;
+    }
+
+    // Kích nổ hạt tại vị trí X, Y
+    function triggerBurst(x, y) {
+      playBurstSound();
+      shockwaves.push(new Shockwave(x, y));
+      for (let i = 0; i < 40; i++) {
+        particles.push(new Particle(true, x, y));
+      }
+    }
+
+    // Sự kiện Click toàn trang để kích nổ
+    window.addEventListener('click', (e) => {
+      // Nếu không bấm vào các nút điều khiển
+      if (!e.target.closest('.ui-interactive') || e.target.closest('#tiltCard') || e.target.id === 'btnBurst') {
+        const x = e.clientX || width / 2;
+        const y = e.clientY || height / 2;
+        triggerBurst(x, y);
+      }
+    });
+
+    document.getElementById('btnBurst').addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerBurst(width / 2, height / 2);
+    });
+
+    // Vẽ các đường nối chòm sao (Constellation Lines)
+    function drawConnections() {
+      if (currentMode !== 'galaxy') return;
+
+      const maxDist = 110;
+      for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
+        if (p1.isBurst) continue;
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          if (p2.isBurst) continue;
+
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < maxDist) {
+            const alpha = (1 - dist / maxDist) * 0.28;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(${currentTheme.rgb2.join(',')}, ${alpha})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+
+        // Nối với chuột nếu ở gần
+        if (mouse.active) {
+          const dx = p1.x - mouse.x;
+          const dy = p1.y - mouse.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < mouse.radius) {
+            const alpha = (1 - dist / mouse.radius) * 0.6;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(${currentTheme.rgb1.join(',')}, ${alpha})`;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    // Vòng lặp Render chính & Đo FPS
+    let lastTime = performance.now();
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+
+    function animate(time) {
+      // Tính FPS thực tế
+      frameCount++;
+      if (time - lastFpsUpdate >= 500) {
+        const currentFps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
+        fpsDisplay.textContent = currentFps;
+        frameCount = 0;
+        lastFpsUpdate = time;
+      }
+
+      // Xóa màn hình với hiệu ứng motion blur mờ nhẹ
+      ctx.fillStyle = 'rgba(7, 9, 19, 0.25)';
+      ctx.fillRect(0, 0, width, height);
+
+      // Cập nhật và vẽ Shockwaves
+      shockwaves = shockwaves.filter(sw => {
+        const active = sw.update();
+        if (active) sw.draw();
+        return active;
+      });
+
+      // Cập nhật và vẽ hạt
+      particles = particles.filter(p => {
+        const alive = p.update(time);
+        if (alive) p.draw();
+        return alive;
+      });
+
+      drawConnections();
+
+      // Cập nhật số lượng hạt động
+      particleCountEl.textContent = particles.length;
+
+      requestAnimationFrame(animate);
+    }
+
+    initParticles();
+    requestAnimationFrame(animate);
+
+    // ==========================================
+    // SỰ KIỆN NÚT CHUYỂN CHẾ ĐỘ & THEME
+    // ==========================================
+    const modeNameEl = document.getElementById('modeName');
+
+    document.querySelectorAll('.btn-mode').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        currentMode = btn.dataset.mode;
+        if (currentMode === 'galaxy') modeNameEl.textContent = 'Cosmic Galaxy';
+        else if (currentMode === 'vortex') modeNameEl.textContent = 'Quantum Vortex';
+        else if (currentMode === 'wave') modeNameEl.textContent = 'Cyber Wave';
+
+        initParticles();
+      });
+    });
+
+    document.querySelectorAll('.color-dot').forEach(dot => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applyTheme(dot.dataset.theme);
+      });
+    });
+  </script>
+</body>
+</html>
