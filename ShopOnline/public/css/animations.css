@@ -1,0 +1,484 @@
+/**
+ * =======================================================================
+ * ShopOnline - Master Animations & Micro-interactions
+ * Thiết kế chuyên biệt cho Chợ Figure & Thẻ Bài
+ * =======================================================================
+ */
+
+:root {
+    --anim-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --anim-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --anim-glow-blue: rgba(13, 110, 253, 0.25);
+    --anim-glow-gold: rgba(255, 193, 7, 0.45);
+    --anim-glow-pink: rgba(236, 72, 153, 0.35);
+}
+
+/* =======================================================================
+   1. ANIMATION BACKGROUND (HỆ THỐNG NỀN ĐỘNG CẢM ỨNG ÁNH SÁNG)
+   ======================================================================= */
+body.bg-animated-storefront {
+    background-color: #f8fafc;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Khung chứa các khối hào quang ánh sáng trôi nổi */
+.bg-animated-mesh {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.38;
+    pointer-events: none;
+    will-change: transform;
+}
+
+/* Khối sáng 1: Neon Cyan */
+.bg-orb-1 {
+    top: -80px;
+    left: -80px;
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle, #38bdf8 0%, rgba(56, 189, 248, 0) 70%);
+    animation: floatOrb1 20s ease-in-out infinite alternate;
+}
+
+/* Khối sáng 2: Neon Purple */
+.bg-orb-2 {
+    top: 35%;
+    right: -120px;
+    width: 580px;
+    height: 580px;
+    background: radial-gradient(circle, #c084fc 0%, rgba(192, 132, 252, 0) 70%);
+    animation: floatOrb2 25s ease-in-out infinite alternate;
+}
+
+/* Khối sáng 3: Solar Amber */
+.bg-orb-3 {
+    bottom: -100px;
+    left: 25%;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, #fbbf24 0%, rgba(251, 191, 36, 0) 70%);
+    animation: floatOrb3 18s ease-in-out infinite alternate;
+}
+
+@keyframes floatOrb1 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(60px, 40px) scale(1.15); }
+    100% { transform: translate(20px, 90px) scale(0.95); }
+}
+
+@keyframes floatOrb2 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-70px, -50px) scale(1.1); }
+    100% { transform: translate(-40px, 60px) scale(1.2); }
+}
+
+@keyframes floatOrb3 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-50px, -40px) scale(1.2); }
+    100% { transform: translate(50px, -20px) scale(0.9); }
+}
+
+/* Canvas hạt bụi sao stardust trôi nổi nhẹ nhàng */
+.bg-particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* =======================================================================
+   2. HIỆU ỨNG THẺ SẢN PHẨM HOLOGRAM & 3D TILT (PRODUCT CARDS)
+   ======================================================================= */
+.product-card {
+    transition: transform 0.35s var(--anim-ease-out),
+                box-shadow 0.35s var(--anim-ease-out),
+                border-color 0.35s ease;
+    will-change: transform, box-shadow;
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(8px);
+}
+
+/* Nâng thẻ mượt mà & bóng mờ phản quang */
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 36px rgba(13, 110, 253, 0.16),
+                0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Phóng to ảnh mượt mà khi hover */
+.product-card .card-img-top {
+    transition: transform 0.45s var(--anim-ease-out), opacity 0.25s ease;
+    will-change: transform, opacity;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Vệt sáng lấp lánh Hologram (Holographic Sheen Foil) quét chéo qua thẻ bài/mô hình */
+.product-card-image-wrap {
+    position: relative;
+}
+
+.product-card-image-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -160%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        115deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.4) 45%,
+        rgba(56, 189, 248, 0.45) 50%,
+        rgba(236, 72, 153, 0.4) 55%,
+        transparent 80%
+    );
+    transform: skewX(-22deg);
+    transition: left 0.75s var(--anim-ease-out);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.product-card:hover .product-card-image-wrap::after {
+    left: 170%;
+}
+
+/* =======================================================================
+   3. NÚT CHUYỂN ẢNH TRÊN TRANG CHÍNH (< > & CHẤM CHỈ BÁO)
+   ======================================================================= */
+.btn-card-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(0.85);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.22s var(--anim-spring);
+    cursor: pointer;
+    z-index: 10;
+    font-size: 14px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.product-card:hover .btn-card-nav {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) scale(1);
+}
+
+.btn-card-nav:hover {
+    background: #0d6efd;
+    color: #ffffff;
+    border-color: #0d6efd;
+    transform: translateY(-50%) scale(1.15) !important;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.5);
+}
+
+.btn-card-nav:active {
+    transform: translateY(-50%) scale(0.95) !important;
+}
+
+/* Dấu chấm chuyển ảnh nhanh trên thẻ sản phẩm */
+.card-dots {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.product-card:hover .card-dots {
+    opacity: 1;
+}
+
+.card-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.card-dot:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.card-dot.active {
+    background: #38bdf8;
+    width: 16px;
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+}
+
+/* =======================================================================
+   4. NÚT CHUYỂN ẢNH TRONG TRANG CHI TIẾT SẢN PHẨM (< > VÀ CHỈ SỐ)
+   ======================================================================= */
+.product-detail-image-box {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-detail-main-img {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-detail-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(6px);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 1.25rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transition: all 0.25s var(--anim-spring);
+    opacity: 0.85;
+}
+
+.btn-detail-prev {
+    left: 12px;
+}
+
+.btn-detail-next {
+    right: 12px;
+}
+
+.product-detail-image-box:hover .btn-detail-nav {
+    opacity: 1;
+}
+
+.btn-detail-nav:hover {
+    background: #0d6efd;
+    color: #ffffff;
+    border-color: #0d6efd;
+    transform: translateY(-50%) scale(1.12);
+    box-shadow: 0 8px 24px rgba(13, 110, 253, 0.45);
+}
+
+.btn-detail-nav:active {
+    transform: translateY(-50%) scale(0.94);
+}
+
+.detail-counter {
+    z-index: 10;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(4px);
+}
+
+/* =======================================================================
+   5. HUY HIỆU NỔI BẬT & GIẢM GIÁ (BADGES)
+   ======================================================================= */
+.badge.bg-warning {
+    position: relative;
+    box-shadow: 0 0 10px var(--anim-glow-gold);
+    animation: pulseGold 2.4s infinite ease-in-out;
+}
+
+@keyframes pulseGold {
+    0%, 100% {
+        box-shadow: 0 0 6px rgba(255, 193, 7, 0.3);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 14px rgba(255, 193, 7, 0.7);
+        transform: scale(1.04);
+    }
+}
+
+.badge.bg-danger {
+    animation: badgePop 3.5s infinite;
+    transform-origin: center;
+}
+
+@keyframes badgePop {
+    0%, 85%, 100% { transform: scale(1); }
+    88% { transform: scale(1.12) rotate(-3deg); }
+    92% { transform: scale(1.12) rotate(3deg); }
+    96% { transform: scale(1.05) rotate(0deg); }
+}
+
+/* =======================================================================
+   6. HERO BANNER CHUYỂN ĐỘNG
+   ======================================================================= */
+.hero-animated-banner {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0d6efd 0%, #4f46e5 50%, #7c3aed 100%) !important;
+    background-size: 200% 200%;
+    animation: gradientShift 10s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* =======================================================================
+   7. HEADER, GIỎ HÀNG, RIPPLE & BACK TO TOP
+   ======================================================================= */
+.btn-cart-animate:hover i.bi-cart3 {
+    display: inline-block;
+    animation: cartWobble 0.6s ease;
+}
+
+@keyframes cartWobble {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-12deg) scale(1.15); }
+    50% { transform: rotate(10deg) scale(1.15); }
+    75% { transform: rotate(-6deg); }
+}
+
+.btn-primary, .btn-outline-primary, .btn-danger, .btn-success {
+    transition: transform 0.18s var(--anim-ease-out),
+                box-shadow 0.18s var(--anim-ease-out),
+                background-color 0.2s ease,
+                border-color 0.2s ease;
+}
+
+.btn-primary:hover, .btn-outline-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary:active, .btn-outline-primary:active {
+    transform: translateY(1px) scale(0.97);
+}
+
+/* Ripple click */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-circle {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: rippleAnim 0.6s linear;
+    background-color: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+}
+
+@keyframes rippleAnim {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Nút cuộn lên đầu trang */
+.btn-back-to-top {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #0d6efd;
+    color: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(13, 110, 253, 0.35);
+    cursor: pointer;
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.85);
+    transition: all 0.35s var(--anim-spring);
+}
+
+.btn-back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.btn-back-to-top:hover {
+    background: #0b5ed7;
+    color: #ffffff;
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 12px 28px rgba(13, 110, 253, 0.45);
+}
+
+/* Scroll reveal */
+.reveal-item {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.65s var(--anim-ease-out),
+                transform 0.65s var(--anim-ease-out);
+    will-change: opacity, transform;
+}
+
+.reveal-item.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.stagger-1 { transition-delay: 0.05s; }
+.stagger-2 { transition-delay: 0.12s; }
+.stagger-3 { transition-delay: 0.19s; }
+.stagger-4 { transition-delay: 0.26s; }
+
+.product-thumb-btn {
+    transition: transform 0.2s var(--anim-ease-out),
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+}
+
+.product-thumb-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
