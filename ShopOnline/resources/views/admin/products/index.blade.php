@@ -76,7 +76,7 @@
                                     <img src="{{ asset($product->DuongDanHinhAnh) }}"
                                          alt="{{ $product->TenSanPham }}"
                                          class="rounded border"
-                                         style="width: 56px; height: 56px; object-fit: cover;">
+                                         style="width: 56px; height: 56px; object-fit: contain; background-color: #fff;">
                                 @else
                                     <div class="rounded border bg-light d-flex align-items-center justify-content-center text-muted"
                                          style="width: 56px; height: 56px;" aria-label="Chưa có ảnh">

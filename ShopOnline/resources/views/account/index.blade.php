@@ -300,7 +300,7 @@
                             <div class="col-6 col-md-3">
                                 <a href="{{ route('products.show', $product->DuongDan) }}" class="text-decoration-none text-dark">
                                     <div class="border rounded p-2 h-100">
-                                        <img src="{{ $product->HinhAnh ? asset($product->HinhAnh) : asset('images/no-image.png') }}" class="w-100 rounded mb-2" style="height:120px;object-fit:cover;" alt="{{ $product->TenSanPham }}">
+                                        <img src="{{ $product->HinhAnh ? asset($product->HinhAnh) : asset('images/no-image.png') }}" class="w-100 rounded mb-2" style="height:120px;object-fit:contain;background-color:#fff;" alt="{{ $product->TenSanPham }}">
                                         <div class="fw-semibold small">{{ $product->TenSanPham }}</div>
                                     </div>
                                 </a>
@@ -318,7 +318,7 @@
                             <div class="col-6 col-md-3">
                                 <a href="{{ route('products.show', $product->DuongDan) }}" class="text-decoration-none text-dark">
                                     <div class="border rounded p-2 h-100">
-                                        <img src="{{ $product->HinhAnh ? asset($product->HinhAnh) : asset('images/no-image.png') }}" class="w-100 rounded mb-2" style="height:120px;object-fit:cover;" alt="{{ $product->TenSanPham }}">
+                                        <img src="{{ $product->HinhAnh ? asset($product->HinhAnh) : asset('images/no-image.png') }}" class="w-100 rounded mb-2" style="height:120px;object-fit:contain;background-color:#fff;" alt="{{ $product->TenSanPham }}">
                                         <div class="fw-semibold small">{{ $product->TenSanPham }}</div>
                                         <div class="text-muted small">Đã mua {{ (int)$product->SoLuongDaMua }}</div>
                                     </div>

@@ -70,7 +70,7 @@
                                                     <img src="{{ $imgUrl }}"
                                                          alt="{{ $item->TenSanPham }}"
                                                          class="rounded border flex-shrink-0"
-                                                         style="width: 64px; height: 64px; object-fit: cover;">
+                                                         style="width: 64px; height: 64px; object-fit: contain; background-color: #fff;">
                                                 @else
                                                     <div class="d-flex align-items-center justify-content-center bg-secondary-subtle text-secondary rounded flex-shrink-0"
                                                          style="width: 64px; height: 64px;">

@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('coupons', 'LoaiPhieu')) {
+            return;
+        }
+
         Schema::table('coupons', function (Blueprint $table): void {
             $table->string('LoaiPhieu', 20)->default('san_pham')->after('MaUuDai');
         });

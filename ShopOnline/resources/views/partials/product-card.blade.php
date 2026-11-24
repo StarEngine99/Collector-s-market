@@ -26,7 +26,7 @@
             <a href="{{ $detailUrl }}" class="text-decoration-none d-block overflow-hidden product-card-image-link">
                 @if ($imageUrl)
                     <img src="{{ $imageUrl }}"
-                         class="card-img-top object-fit-cover product-card-img"
+                         class="card-img-top object-fit-contain product-card-img"
                          style="height: 210px;"
                          alt="{{ $product->MoTaHinhAnh ?? $product->TenSanPham }}">
                 @else
@@ -68,6 +68,9 @@
                     <span class="badge bg-danger">-{{ $product->PhanTramGiam }}%</span>
                 @endif
             </div>
+            @if (!empty($product->LaHangMoi))
+                <span class="badge bg-success position-absolute top-0 end-0 m-2" style="z-index: 4;">Hàng Mới</span>
+            @endif
         </div>
 
         <div class="card-body d-flex flex-column">
@@ -91,18 +94,26 @@
                     @endif
                 </div>
 
-                {{-- Đánh giá sao & Đã bán (Yêu cầu 5) --}}
+                {{-- Đánh giá và số lượng đã bán thực tế --}}
                 <div class="d-flex justify-content-between align-items-center small text-muted pt-1 border-top mt-1" style="font-size: 11px;">
-                    <div class="d-flex align-items-center text-warning">
-                        <i class="bi bi-star-fill me-1"></i>
-                        <span class="fw-bold text-dark me-1 product-card-rating">{{ $product->DiemDanhGia ?? 5.0 }}</span>
-                        @if (!empty($product->SoDanhGia))
+                    @if (($product->SoDanhGia ?? 0) > 0)
+                        <div class="d-flex align-items-center text-warning">
+                            <i class="bi bi-star-fill me-1"></i>
+                            <span class="fw-bold text-dark me-1 product-card-rating">{{ number_format((float) $product->DiemDanhGia, 1) }}</span>
                             <span class="text-muted">({{ $product->SoDanhGia }})</span>
-                        @endif
-                    </div>
-                    <div class="text-secondary product-card-sold">
-                        Đã bán {{ $product->DaBan ?? 1 }}
-                    </div>
+                        </div>
+                    @else
+                        <div class="d-flex align-items-center text-secondary" aria-label="Chưa có đánh giá">
+                            @for ($s = 0; $s < 5; $s++)
+                                <i class="bi bi-star me-1"></i>
+                            @endfor
+                        </div>
+                    @endif
+                    @if (($product->DaBan ?? 0) > 0)
+                        <div class="text-secondary product-card-sold">
+                            Đã bán {{ $product->DaBan }}
+                        </div>
+                    @endif
                 </div>
 
                 <div class="mt-1 small">

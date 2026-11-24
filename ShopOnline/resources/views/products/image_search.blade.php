@@ -9,7 +9,7 @@
             <img src="{{ $uploadedImage }}"
                  alt="Ảnh tìm kiếm"
                  class="rounded-3 border border-white border-2 shadow"
-                 style="width: 80px; height: 80px; object-fit: cover;">
+                 style="width: 80px; height: 80px; object-fit: contain; background-color: #fff;">
             <div>
                 <h1 class="h4 fw-bold mb-1">Kết quả tìm kiếm bằng hình ảnh</h1>
                 <p class="mb-0 text-white-50">Đã tìm thấy {{ $totalCount }} sản phẩm có đặc điểm thị giác tương đồng nhất.</p>

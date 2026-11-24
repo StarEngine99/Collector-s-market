@@ -130,7 +130,7 @@ body.bg-animated-storefront {
 }
 
 .product-card:hover .card-img-top {
-    transform: scale(1.05);
+    transform: none;
 }
 
 /* Vệt sáng lấp lánh Hologram (Holographic Sheen Foil) quét chéo qua thẻ bài/mô hình */

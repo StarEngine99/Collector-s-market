@@ -116,7 +116,7 @@
                         <img src="{{ asset($image->DuongDanHinhAnh) }}"
                              alt="{{ $image->MoTaHinhAnh ?? $product->TenSanPham }}"
                              class="d-block rounded mb-2"
-                             style="width: 110px; height: 110px; object-fit: cover;">
+                             style="width: 110px; height: 110px; object-fit: contain; background-color: #fff;">
                         <span class="small">
                             <input type="checkbox"
                                    name="XoaHinhAnh[]"

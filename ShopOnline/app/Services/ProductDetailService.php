@@ -88,8 +88,8 @@ class ProductDetailService
             ->orderByDesc('product_reviews.NgayTao')
             ->get();
 
-        $avgRating = $reviews->isNotEmpty() ? round($reviews->avg('SoSao'), 1) : 5.0;
-        $reviewsCount = $reviews->count();
+        $avgRating = $enrichedProduct->DiemDanhGia;
+        $reviewsCount = $enrichedProduct->SoDanhGia;
 
         $userId = auth()->id();
         $isFavorited = false;
@@ -100,12 +100,7 @@ class ProductDetailService
                 ->exists();
         }
 
-        $soldCount = (int) DB::table('order_items')
-            ->where('MaSanPham', $product->MaSanPham)
-            ->sum('SoLuong');
-        if ($soldCount <= 0) {
-            $soldCount = (abs(crc32($product->MaSKU)) % 50) + 6;
-        }
+        $soldCount = $enrichedProduct->DaBan;
 
         return [
             'product' => $enrichedProduct,

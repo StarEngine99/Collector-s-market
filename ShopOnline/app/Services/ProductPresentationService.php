@@ -55,14 +55,19 @@ class ProductPresentationService
         $productIds = $products->pluck('MaSanPham')->all();
         $imagesByProduct = $this->getAllImagesMap($productIds);
         $promotionsByProduct = $this->getActivePromotionsMap($productIds);
+        $now = Carbon::now();
 
-        return $products->map(function (object $product) use ($imagesByProduct, $promotionsByProduct): object {
+        return $products->map(function (object $product) use ($imagesByProduct, $promotionsByProduct, $now): object {
             $images = $imagesByProduct->get($product->MaSanPham, collect());
             $firstImage = $images->first();
 
             $product->DanhSachHinhAnh = $images;
             $product->HinhAnhDaiDien = $firstImage->DuongDanHinhAnh ?? null;
             $product->MoTaHinhAnh = $firstImage->MoTaHinhAnh ?? $product->TenSanPham;
+            $publishedAt = $product->NgayDang !== null ? Carbon::parse($product->NgayDang) : null;
+            $product->LaHangMoi = $publishedAt !== null
+                && $publishedAt->greaterThanOrEqualTo($now->copy()->subDays(2))
+                && $publishedAt->lessThanOrEqualTo($now);
 
             $pricing = $this->calculateDiscountedPrice(
                 (float) $product->Gia,
@@ -74,20 +79,21 @@ class ProductPresentationService
             $product->CoGiamGia = $pricing['co_giam_gia'];
             $product->PhanTramGiam = $pricing['phan_tram_giam'];
 
-            // Thống kê Đã bán và Đánh giá sao (Yêu cầu 5)
-            $sold = (int) DB::table('order_items')->where('MaSanPham', $product->MaSanPham)->sum('SoLuong');
-            if ($sold <= 0) {
-                $sold = (abs(crc32((string)($product->MaSKU ?? 'sku'))) % 45) + 5;
-            }
-            $product->DaBan = $sold;
+            $product->DaBan = (int) DB::table('order_items')
+                ->join('orders', 'orders.MaDonHang', '=', 'order_items.MaDonHang')
+                ->where('order_items.MaSanPham', $product->MaSanPham)
+                ->where('orders.TrangThai', 'completed')
+                ->sum('order_items.SoLuong');
 
             $revStats = DB::table('product_reviews')
                 ->where('MaSanPham', $product->MaSanPham)
                 ->whereIn('TrangThai', ['published', 'approved'])
                 ->selectRaw('AVG(SoSao) as avg_rating, COUNT(*) as total_reviews')
                 ->first();
-            $product->DiemDanhGia = ($revStats && $revStats->total_reviews > 0) ? round((float)$revStats->avg_rating, 1) : 5.0;
             $product->SoDanhGia = $revStats ? (int) $revStats->total_reviews : 0;
+            $product->DiemDanhGia = $product->SoDanhGia > 0
+                ? round((float) $revStats->avg_rating, 1)
+                : null;
 
             return $product;
         });

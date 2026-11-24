@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\View\Composers\HeaderComposer;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrapFive();
         View::composer('partials.header', HeaderComposer::class);
         Gate::before(static fn (User $user, string $ability): ?bool =>
             $user->hasPermission($ability) ? true : null

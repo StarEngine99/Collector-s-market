@@ -56,6 +56,9 @@
                                 <i class="bi bi-image fs-1"></i>
                             </div>
                         @endif
+                        @if (!empty($product->LaHangMoi))
+                            <span class="badge bg-success position-absolute top-0 end-0 m-2">Hàng Mới</span>
+                        @endif
 
                         @if ($images->count() > 1)
                             <!-- Nút chuyển ảnh trước < -->
@@ -97,7 +100,7 @@
                                         aria-label="Xem ảnh {{ $index + 1 }}">
                                     <img src="{{ $thumbUrl }}"
                                          alt="{{ $image->MoTaHinhAnh ?? $product->TenSanPham }}"
-                                         style="width: 68px; height: 68px; object-fit: cover;">
+                                         style="width: 68px; height: 68px; object-fit: contain; background-color: #fff;">
                                 </button>
                             @endforeach
                         </div>
@@ -116,18 +119,28 @@
 
                     <h1 class="h3 fw-bold mb-2">{{ $product->TenSanPham }}</h1>
 
-                    {{-- Đánh giá sao & Đã bán (Yêu cầu 3 & 5) --}}
+                    {{-- Đánh giá và số lượng đã bán thực tế --}}
                     <div class="d-flex align-items-center gap-2 text-muted small mb-3">
-                        <div class="d-flex align-items-center text-warning">
-                            @for ($s = 1; $s <= 5; $s++)
-                                <i class="bi bi-star{{ $s <= round($avgRating ?? 5) ? '-fill' : '' }}"></i>
-                            @endfor
-                            <span class="ms-1 fw-bold text-dark">{{ $avgRating ?? 5.0 }}</span>
-                        </div>
+                        @if (($reviewsCount ?? 0) > 0)
+                            <div class="d-flex align-items-center text-warning">
+                                @for ($s = 1; $s <= 5; $s++)
+                                    <i class="bi bi-star{{ $s <= round($avgRating) ? '-fill' : '' }}"></i>
+                                @endfor
+                                <span class="ms-1 fw-bold text-dark">{{ number_format((float) $avgRating, 1) }}</span>
+                            </div>
+                        @else
+                            <div class="d-flex align-items-center text-secondary" aria-label="Chưa có đánh giá">
+                                @for ($s = 0; $s < 5; $s++)
+                                    <i class="bi bi-star"></i>
+                                @endfor
+                            </div>
+                        @endif
                         <span>·</span>
                         <a href="#reviewsSection" class="text-decoration-none text-muted">{{ $reviewsCount ?? 0 }} đánh giá</a>
-                        <span>·</span>
-                        <span class="text-secondary">Đã bán <strong>{{ $soldCount ?? 1 }}</strong></span>
+                        @if (($soldCount ?? 0) > 0)
+                            <span>·</span>
+                            <span class="text-secondary">Đã bán <strong>{{ $soldCount }}</strong></span>
+                        @endif
                     </div>
 
                     <div class="mb-3 p-3 bg-light rounded">
@@ -228,12 +241,21 @@
             <div class="row g-4 mb-4">
                 {{-- Tổng quan điểm số --}}
                 <div class="col-12 col-md-4 text-center border-end-md pb-3 pb-md-0">
-                    <div class="display-4 fw-bold text-warning mb-1">{{ $avgRating ?? 5.0 }}<span class="fs-4 text-muted">/5</span></div>
-                    <div class="text-warning mb-2">
-                        @for ($s = 1; $s <= 5; $s++)
-                            <i class="bi bi-star{{ $s <= round($avgRating ?? 5) ? '-fill' : '' }} fs-5"></i>
-                        @endfor
-                    </div>
+                    @if (($reviewsCount ?? 0) > 0)
+                        <div class="display-4 fw-bold text-warning mb-1">{{ number_format((float) $avgRating, 1) }}<span class="fs-4 text-muted">/5</span></div>
+                        <div class="text-warning mb-2">
+                            @for ($s = 1; $s <= 5; $s++)
+                                <i class="bi bi-star{{ $s <= round($avgRating) ? '-fill' : '' }} fs-5"></i>
+                            @endfor
+                        </div>
+                    @else
+                        <div class="text-secondary fs-6 mb-1">Chưa có đánh giá</div>
+                        <div class="text-secondary mb-2" aria-label="5 sao, chưa có đánh giá">
+                            @for ($s = 0; $s < 5; $s++)
+                                <i class="bi bi-star fs-5"></i>
+                            @endfor
+                        </div>
+                    @endif
                     <div class="text-muted small">Dựa trên {{ $reviewsCount ?? 0 }} lượt đánh giá của khách hàng</div>
                 </div>
 
