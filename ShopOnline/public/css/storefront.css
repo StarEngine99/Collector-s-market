@@ -116,6 +116,18 @@
     color: #a8b0bf !important;
 }
 
+[data-theme="dark"] .btn-cart-animate {
+    color: #e5e7eb;
+    border-color: #94a3b8;
+}
+
+[data-theme="dark"] .btn-cart-animate:hover,
+[data-theme="dark"] .btn-cart-animate:focus-visible {
+    color: #0f172a;
+    background-color: #e5e7eb;
+    border-color: #e5e7eb;
+}
+
 [data-theme="dark"] .border,
 [data-theme="dark"] .border-top,
 [data-theme="dark"] .border-bottom {

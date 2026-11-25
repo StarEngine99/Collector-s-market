@@ -47,6 +47,12 @@
         <i class="bi bi-images me-2"></i> Banner trang chủ
     </a>
 @endcan
+@can('users.manage')
+    <a href="{{ route('admin.reviews.index') }}"
+       class="list-group-item list-group-item-action border-0 admin-nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+        <i class="bi bi-star-half me-2"></i> Đánh giá sản phẩm
+    </a>
+@endcan
 @can('reports.view')
     <a href="{{ route('admin.reports.index') }}"
        class="list-group-item list-group-item-action border-0 admin-nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">

@@ -82,6 +82,7 @@ class CheckoutService
                         'products.Gia',
                         'products.SoLuongTon',
                         'products.TrangThai',
+                        'products.NgayDang',
                         'products.NgayXoa',
                         'categories.TenDanhMuc',
                         'categories.TrangThai as TrangThaiDanhMuc',

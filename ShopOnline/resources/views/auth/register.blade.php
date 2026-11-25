@@ -3,7 +3,20 @@
 @section('title', 'Đăng ký tài khoản - Chợ Figure & Thẻ Bài')
 
 @push('styles')
+<link rel="stylesheet" href="{{ asset('css/auth-lamp.css') }}">
 <style>
+body > header,
+body > footer { display: none !important; }
+body.d-flex.flex-column main.flex-grow-1 {
+    min-height: 100vh;
+    padding: 0 !important;
+}
+body.d-flex.flex-column main.flex-grow-1 > .container {
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;
+}
 /* ============================================================
    Auth Card – Glassmorphism (shared with login)
    ============================================================ */
@@ -238,10 +251,10 @@
 @endpush
 
 @section('content')
-<div class="row justify-content-center py-4">
-    <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-6">
-
-        <div class="auth-glass-card p-4 p-md-5 reveal-item">
+<section class="lamp-auth register-lamp-auth" data-auth-lamp data-lamp-target="#registerCard" data-lamp-on="{{ $errors->any() ? 'true' : 'false' }}" aria-label="Đăng ký tài khoản">
+    @include('auth.partials.interactive-lamp', ['prompt' => 'Kéo dây để mở biểu mẫu'])
+    <div class="login-card-column">
+        <div class="auth-glass-card p-4 p-md-5 register-lamp-card" id="registerCard" aria-hidden="false">
 
             {{-- Header --}}
             <div class="text-center mb-4">
@@ -417,10 +430,11 @@
 
         </div>{{-- /.auth-glass-card --}}
     </div>
-</div>
+</section>
 @endsection
 
 @push('scripts')
+<script src="{{ asset('js/auth-lamp.js') }}"></script>
 <script>
 (function () {
     /* ---- Hiện/Ẩn mật khẩu ---- */

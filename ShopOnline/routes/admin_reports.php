@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,7 @@ Route::middleware(['auth', 'can:users.manage'])
     ->name('admin.')
     ->group(function (): void {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/danh-gia', [ReviewController::class, 'index'])->name('reviews.index');
     });
 
 Route::middleware(['auth', 'can:reports.view'])

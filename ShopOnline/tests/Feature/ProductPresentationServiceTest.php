@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Services\CartService;
 use App\Services\ProductPresentationService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -35,6 +36,17 @@ class ProductPresentationServiceTest extends TestCase
             $table->boolean('NoiBat');
             $table->timestamp('NgayDang')->nullable();
             $table->timestamp('NgayXoa')->nullable();
+        });
+        Schema::create('carts', function (Blueprint $table): void {
+            $table->bigIncrements('MaGioHang');
+            $table->unsignedBigInteger('MaNguoiDung')->nullable();
+            $table->string('KhoaPhien')->nullable();
+        });
+        Schema::create('cart_items', function (Blueprint $table): void {
+            $table->bigIncrements('MaChiTietGioHang');
+            $table->unsignedBigInteger('MaGioHang');
+            $table->unsignedBigInteger('MaSanPham');
+            $table->unsignedInteger('SoLuong');
         });
         Schema::create('product_images', function (Blueprint $table): void {
             $table->bigIncrements('MaHinhAnh');
@@ -118,5 +130,39 @@ class ProductPresentationServiceTest extends TestCase
         $older = $products->get($productIds[49]);
         $this->assertFalse($older->LaHangMoi);
         $this->assertSame(2, $older->DaBan);
+    }
+
+    public function test_guest_cart_summary_enriches_products_with_their_publish_date(): void
+    {
+        $categoryId = (int) DB::table('categories')->insertGetId([
+            'TenDanhMuc' => 'Cart category',
+            'DuongDan' => 'cart-category',
+            'TrangThai' => 'active',
+        ]);
+        $productId = (int) DB::table('products')->insertGetId([
+            'MaDanhMuc' => $categoryId,
+            'MaSKU' => 'CART-' . uniqid(),
+            'TenSanPham' => 'Cart test product',
+            'DuongDan' => 'cart-test-' . uniqid(),
+            'Gia' => 100000,
+            'SoLuongTon' => 3,
+            'TrangThai' => 'active',
+            'NoiBat' => false,
+            'NgayDang' => null,
+        ]);
+        $sessionKey = 'cart-test-' . uniqid();
+        $cartId = (int) DB::table('carts')->insertGetId([
+            'KhoaPhien' => $sessionKey,
+        ]);
+        DB::table('cart_items')->insert([
+            'MaGioHang' => $cartId,
+            'MaSanPham' => $productId,
+            'SoLuong' => 1,
+        ]);
+
+        $summary = app(CartService::class)->getCartSummary(null, $sessionKey);
+
+        $this->assertCount(1, $summary['items']);
+        $this->assertFalse($summary['items']->first()->LaHangMoi);
     }
 }
