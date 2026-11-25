@@ -54,7 +54,7 @@
                 <path d="M-18 14C-24 38-50 66-68 92h136C50 66 24 38 18 14H-18Z" fill="url(#lampMetal)" stroke="#2b3141"/>
                 <ellipse cx="0" cy="92" rx="66" ry="16" fill="#090b10" stroke="#262c3b"/>
                 <ellipse class="lamp-glow" cx="0" cy="92" rx="64" ry="15" fill="#ffd479" stroke="#ffe29a" stroke-width="3"/>
-                <ellipse class="lamp-glow" cx="0" cy="83" rx="14" ry="12" fill="url(#lampBulb)"/>
+                <ellipse class="lamp-glow" cx="0" cy="92" rx="10" ry="10" fill="url(#lampBulb)"/>
             </g>
         </svg>
         <div class="pull-tooltip" aria-hidden="true">
