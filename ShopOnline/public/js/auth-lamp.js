@@ -33,7 +33,7 @@
 
     function renderPull(value) {
         dy = Math.max(0, Math.min(58, value));
-        line.setAttribute('d', `M254 204Q254 ${268 + dy * .45} 254 ${332 + dy}`);
+        line.setAttribute('d', `M266 196Q266 ${264 + dy * .45} 266 ${332 + dy}`);
         pull.setAttribute('transform', `translate(0 ${dy})`);
     }
 
