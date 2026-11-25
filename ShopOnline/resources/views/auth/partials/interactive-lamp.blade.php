@@ -41,11 +41,11 @@
                 <circle r="8" fill="none" stroke="url(#lampGold)" stroke-width="2.2"/>
             </g>
 
-            <path class="pull-line" d="M254 204Q254 268 254 332" stroke="#8e94a4" stroke-width="2" stroke-linecap="round"/>
+            <path class="pull-line" d="M266 196Q266 264 266 332" stroke="#8e94a4" stroke-width="2" stroke-linecap="round"/>
             <g class="pull-cord" role="switch" tabindex="0" aria-checked="false" aria-label="Kéo dây để bật đèn">
-                <circle cx="254" cy="332" r="32" fill="transparent"/>
-                <circle cx="254" cy="332" r="14" fill="#f5a524" opacity=".18"/>
-                <circle cx="254" cy="332" r="8" fill="url(#lampGold)"/>
+                <circle cx="266" cy="332" r="32" fill="transparent"/>
+                <circle cx="266" cy="332" r="14" fill="#f5a524" opacity=".18"/>
+                <circle cx="266" cy="332" r="8" fill="url(#lampGold)"/>
             </g>
 
             <g transform="translate(202 130) rotate(-44)">
